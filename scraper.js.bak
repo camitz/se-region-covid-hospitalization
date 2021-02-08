@@ -1,0 +1,716 @@
+var text, parser, xmlDoc;
+moment.locale('sv');
+
+$.ajaxPrefilter( function (options) {
+  if (options.crossDomain && jQuery.support.cors) {
+    var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
+    options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
+    //options.url = "http://cors.corsproxy.io/url=" + options.url;
+  }
+});
+
+
+class Scraper{
+	constructor(url){
+		if(url) {
+			var a = document.createElement('a');
+			a.href=url;
+			var m = a.pathname.match(/(?<=:)\/.+/);
+			if(m) {
+				this._path = m[0].substr(1);
+			}else {
+				this._path = null;
+				this._baseUrl = url;
+			}
+		}
+	}
+
+	get url(){
+		if(this._path){
+			var a = document.createElement('a');
+			a.href=this._baseUrl;
+            this._baseUrl = `${a.protocol}//${a.host}/${this._path}`;
+            this._path=null;
+		}
+		return this._baseUrl;
+	}
+
+	do(){
+		var me = this;
+    	try {
+    		this.scrape().then(function(r){me.produceRow(r);});
+		    
+    	} catch(e){
+    		console.log(e);
+    		mw.produceError();
+			
+    	} 
+	}
+
+	scrape(){
+		var me = this;
+		return new Promise((resolve,reject)=>{
+		$.ajax({
+            url : this.url,
+            success : function(result){
+
+				if(me.parse){
+					parser = new DOMParser();   
+					xmlDoc = parser.parseFromString(result,"text/html");
+					resolve(me.parse(xmlDoc));
+				}        
+				else
+					resolve(me.parseJson(result));
+            }    
+        });
+		});
+    }
+
+     produceRow(result){
+     	var row = document.createElement('tr');
+			row.innerHTML = `<td>${this.name}</td>`;
+				var date,iva,inl,raw,t,url;   
+        	[date, inl, iva, raw,url] = result;
+            row.innerHTML += `<td>${date.format('D MMMM')}</td><td>${inl}</td><td>${iva}</td><td>${raw}</td>`;
+    		row.innerHTML += `<td><a href="${url?url:this.url}">${url?url:this.url}</td>`;
+            document.getElementById("p").appendChild(row);		
+     }
+
+     produceError(){
+     	var row = document.createElement('tr');
+			row.innerHTML = `<td>${me.name}</td>`;
+    		row.innerHTML += "<td colspan=4>Fel!</td>";
+            document.getElementById("p").appendChild(row);		
+     }
+
+	
+
+	get ordinals(){
+		return ['noll','ett','två','tre','fyra','fem','sex','sju','åtta','nio','tio','elva','tolv','tretton','fjorton','femton','sexton','sjutton','arton','nitton'];
+	  }
+	ordinalOrNumber(s){
+        var r = this.ordinals.indexOf(s.toLowerCase());
+		return r == -1 ? s*1 : r;
+	}
+}
+
+class Varmland extends Scraper{
+    _baseUrl = 'https://www.regionvarmland.se/halsa-och-vard/coronavirus---covid-19/aktuellt-lage-i-varmland--covid-19/';
+
+  parse(xmlDoc){
+        var date = xmlDoc.evaluate('//*[@id="ReadSpeaker"]//div//div//p[last()]//em//text()',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
+        date = moment(date.match(/Senast uppdaterad (\d+ \w+)/)[1]);
+        var inl = [...xmlDoc.evaluate('//*[@id="ReadSpeaker"]/div/div/p[4]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue.matchAll(/:\s(\d+) patienter/g)];
+        inl = inl.reduce((a,b) => a + b[1]*1, 0);
+        var iva = [...xmlDoc.evaluate('//*[@id="ReadSpeaker"]/div/div/p[4]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue.matchAll(/:\s(\d+) patienter, varav (\d+)/g)];
+        iva = iva.reduce((a,b) => a + b[2]*1, 0);
+
+        return [date,inl,iva];
+  }
+}
+
+
+class Halland extends Scraper{
+    _baseUrl = 'https://www.regionhalland.se/om-region-halland/smittskydd/information-om-det-nya-coronaviruset/';
+
+	get name() {
+    return 'Halland';
+  }
+
+  parse(xmlDoc){
+        var data = xmlDoc.evaluate('//*[@id="antal-fall-i-halland-5"]/following-sibling::p[1]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
+        data = [...data.matchAll(/[^\d]+(\d+).+\(([\d-]+)\)[^\d]+(\d+)[^\d]+(ett|två|tre|fyra|fem|sex|sju|åtta|nio|tio|\d+)[^\d]+(ett|två|tre|fyra|fem|sex|sju|åtta|nio|tio|\d+)/gi)][0];
+        var date = moment(data[2]);
+        var inl = this.ordinalOrNumber(data[3]);
+        var iva = this.ordinalOrNumber(data[4]);
+
+        return [date,inl,iva,data[0]];
+  }
+}
+
+class VG extends Scraper{
+    _baseUrl = 'https://www.vgregion.se/covid-19-corona/';
+
+	get name() {
+    return 'Västa götaland';
+  }
+
+  parse(){
+        var raw = xmlDoc.evaluate('//*[@id="main-content"]/div[1]/div[2]/div/div[2]/p[1]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
+        var data = [...raw.matchAll(/Den (\d+ \w+) kl. \d\d:\d\d\D+(\d+)\D+covid-19\D+(\d+)/gi)][0];
+        var date = moment(data[1]);
+        var inl = data[2]*1;
+        var iva = data[3]*1;
+
+        return [date,inl,iva,raw];
+  }
+}
+
+
+class Vastmanland extends Scraper{
+    _baseUrl = 'https://regionvastmanland.se/uppdateringar-fran-region-vastmanland-om-covid-19/covid-19-laget-i-lanet/';
+
+	get name() {
+    return 'Västmanland';
+  }
+
+  parse(xmlDoc){
+        var node = xmlDoc.evaluate('//*[@id="maincontent"]/section[1]/div/div[2]/p', xmlDoc );
+        var t = {};
+        do{
+            t=node.iterateNext();
+        }while(!t.innerText.match(/\d{4}-\d{2}-\d{2}/g));
+        var raw = t.innerText;
+        var date = moment(t.innerText);
+        node.iterateNext();
+        t = node.iterateNext();
+        raw += t.innerText;
+        var inl = t.innerText.match(/\d+/)[0]*1;
+        t = node.iterateNext();
+        raw += t.innerText;
+        var iva = t.innerText.match(/\d+/)[0]*1;
+
+        return [date,inl,iva,raw];
+  }
+}
+
+class Blekinge extends Scraper{
+    _baseUrl = 'https://regionblekinge.se/halsa-och-vard/for-vardgivare/smittskyddsenheten/information-om-coronaviruset.html';
+
+	get name() {
+    return 'Blekinge';
+  }
+
+  parse(xmlDoc){
+        var raw = xmlDoc.evaluate('//*[@id="svid12_2cd827be170f3b15ca913afb"]/div[2]/div/div//table', xmlDoc).iterateNext();
+        raw = raw.innerHTML;
+
+        var node = xmlDoc.evaluate('//*[@id="svid12_2cd827be170f3b15ca913afb"]/div[2]/div/div//table/tbody/tr/td', xmlDoc);
+        var t = node.iterateNext();
+        var t = node.iterateNext();
+
+        var inl = t.innerText.match(/\d+/)[0]*1;
+        var iva = t.innerText.match(/\((\d+)/)[1];
+
+        var date = xmlDoc.evaluate('//*[@id="svid12_2cd827be170f3b15ca913af1"]//h2', xmlDoc).iterateNext().innerText.match(/den (\d{1,2} \w+)/)[1];
+        date = moment(date);
+
+        return [date,inl,iva,raw];
+  }
+}
+
+
+
+class Sormland extends Scraper{
+    _baseUrl = 'https://regionsormland.se/halsa-vard/information-om-coronaviruset-covid-19/';
+
+	get name() {
+    return 'Sörmland';
+  }
+
+  parse(xmlDoc){
+        var raw = xmlDoc.evaluate('//*[@id="content"]/div[1]/p[1]', xmlDoc).iterateNext().innerText;
+        var t = [...raw.matchAll(/(\d\d? \w+): (\d+).+?\. (\d+)/gi)][0];
+
+        var inl = t[2];
+        var iva = t[3];
+
+        var date = moment(t[1]);
+
+        return [date,inl,iva,raw];
+  }
+}
+
+
+class Norrbotten extends Scraper{
+    _baseUrl = 'https://www.norrbotten.se/sv/Halsa-och-sjukvard/Smittskydd-i-Norrbotten/Information-om-nya-coronaviruset/';
+
+	get name() {
+    return 'Norrbotten';
+  }
+
+  parse(xmlDoc){
+        var raw = xmlDoc.evaluate('//*[@id="rs_read_text"]/div[2]/ul[1]/li[2]/span', xmlDoc).iterateNext().innerText;
+        var t = [...raw.matchAll(/\d+/g)];
+
+        var inl = t[0][0]*1;
+        var iva = t[1][0]*1;
+
+        t = xmlDoc.evaluate('//*[@id="rs_read_text"]/div[2]/p[3]/span', xmlDoc).iterateNext().innerText;
+        raw +=t;
+
+        var date = moment(raw.match(/(\d\d? \w+)/gi)[0]);
+        
+
+        return [date,inl,iva,raw];
+  }
+}
+
+
+class Skane extends Scraper{
+    _baseUrl = 'https://www.skane.se/organisation-politik/Nyheter/Halsa-och-vard/2020/covid-19-lagesbild-covid-19-i-skane/';
+
+	get name() {
+    return 'Skåne';
+  }
+
+  parse(xmlDoc){
+        var raw = xmlDoc.evaluate("//*[@id='content']/div/article//h2[contains(text(),'Aktuella siffror')]/following-sibling::*", xmlDoc).iterateNext().innerText;
+        var t = [...raw.matchAll(/(\d+), varav (\d+)/gi)][0];
+
+        var inl = t[1]*1;
+        var iva = t[2]*1;
+
+        t = xmlDoc.evaluate("//*[@id='content']/div/article/div[@class='ingress'][1]", xmlDoc).iterateNext().innerText;
+        raw +=t;
+
+        var date = moment(t.match(/(\d\d? \w+)/gi)[0]);
+        
+
+        return [date,inl,iva,raw];
+  }
+}
+
+
+class Uppsala extends Scraper{
+    _baseUrl = 'https://via.tt.se/json/v2/releases?publisher=3235664';
+
+	get name() {
+    return 'Uppsala';
+  }
+
+  parseJson(result){
+        var raw = result.releases.filter(x=>x.title.startsWith("Covid") && x.title.indexOf("Läget")>-1)[0];
+        var date = moment(raw.title.match(/(\d\d? \w+)/gi)[0]);
+        var t = document.createElement("div");
+        t.innerHTML=raw.body;
+        t= [...t.innerText.matchAll(/(\d+) personer med covid-19\D+(\d+)/gi)][0];
+
+        var inl = t[1]*1;
+        var iva = t[2]*1;
+
+        raw = (raw.title+raw.body).substr(0,300);
+        
+
+        return [date,inl,iva,raw];
+  }
+}
+
+
+class Jokoping extends Scraper{
+    _baseUrl = 'https://www.rjl.se/api/minanyheterlistblockitemapi?minanyhetertags=407&sincendays=500&listpage=51359&skipcache=true';
+
+	get name() {
+    return 'Jönköping';
+  }
+
+  parseJson(result){
+        var raw = result.filter(x=>x.Heading.startsWith("Uppdatering om covid"))[0];
+        var t = RegExp('(\\d+)\\D+(\\d+ \\w+) \\d+.+?\\. ('+this.ordinals.reverse().join('|')+')').exec(raw.Preamble.toLowerCase());
+        
+        var date = moment(t[2]);
+
+        var inl = t[1]*1;
+        var iva = this.ordinalOrNumber(t[3]);
+
+        raw = raw.preamble;
+        
+
+        return [date,inl,iva,raw];
+  }
+}
+
+
+class Vasterbotten extends Scraper{
+    _baseUrl = 'https://www.regionvasterbotten.se/coronavirus/aktuellt-vardlage-i-region-vasterbotten-covid-19';
+
+  	get name() {
+    return 'Västerbotten';
+  }
+
+
+  parse(xmlDoc){
+        var raw = xmlDoc.evaluate('//*[@id="ctl05"]/div[3]/h2[1]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
+        var date = moment(raw.match(/Lägesbild den\s(\d+ \w+)/)[1]);
+        
+        var raw1 = xmlDoc.evaluate('//*[@id="ctl05"]/div[3]/p[2]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
+
+        var t = raw1.match(/\d+/g);
+        var inl = t[1]*1;
+        var iva = t[2]*1;
+
+        return [date,inl,iva,raw+raw1];
+  }
+}
+
+
+class Gotland extends Scraper{
+    _baseUrl = 'https://www.gotland.se/nyhetsarkiv';
+
+	get name() {
+    return 'Gotland';
+  }
+
+  parse(xmlDoc){
+        var t=xmlDoc.evaluate('//*[@id="newsItems"]/ul/li/article/a', xmlDoc);
+        var i;
+        do{
+            i = t.iterateNext();
+        }while(!i.querySelector('.news-header').innerText.startsWith("Lägesrapport om det nya"));
+        var raw = i.innerText;
+
+        var date = moment(i.querySelector('.news-date').innerText);
+        
+       var t = new GotlandSub(i.href);
+
+       return t.scrape();
+
+  }
+}
+
+
+class GotlandSub extends Scraper{
+
+  parse(xmlDoc){
+        var t=xmlDoc.evaluate('//*[@id="content"]/div[2]', xmlDoc);
+        var raw = t.iterateNext().innerText.substr(0,300);
+        var date = moment(raw.match(/\d+ \w+/));
+        return [date,null,null,raw,this.url];
+  }
+}
+
+
+
+class JH extends Scraper{
+    _baseUrl = 'https://www.regionjh.se/';
+
+	get name() {
+    return 'Jämtland Härjedalen';
+  }
+
+  parse(xmlDoc){
+        var t=xmlDoc.evaluate('//*[@id="svid12_43e32b9815b44bf8a8199f96"]/ul/li/a', xmlDoc);
+        var i;
+        do{
+            i = t.iterateNext();
+        }while(!i.innerText.trim().startsWith("Lägesrapport"));
+       var t = new JHSub(i.href);
+
+       return t.scrape();
+
+  }
+}
+
+
+class JHSub extends Scraper{
+  parse(xmlDoc){
+        var t=xmlDoc.evaluate('//h1[@class="heading" and contains(@id,"h-Lagesrapport")]', xmlDoc).iterateNext();
+        var raw = t.innerText;
+        var date = moment(t.innerText.match(/\d\d-\d\d-\d\d/g)[0],"YY-MM-DD");
+                
+        t = t.parentElement.parentElement.nextElementSibling.innerText;
+        t=[...t.matchAll(/(\d+) varav (\d+)/g)][0];
+
+        return [date,t[1]*1,t[2]*1,raw,this.url];
+  }
+}
+
+class Kronoberg extends Scraper{
+    _baseUrl = 'http://www.regionkronoberg.se/corona';
+
+	get name() {
+    return 'Kronoberg';
+  }
+
+  parse(xmlDoc){
+        var table = xmlDoc.evaluate('//*[@id="content"]/div[1]/div', xmlDoc).iterateNext();
+        var t = table.querySelectorAll('table td')[4].innerText;
+        var raw = table.innerText.substr(0,300);
+
+        var p = table.querySelector('p');
+
+        var date = moment(table.querySelector('table ~ p').innerText.match(/\d+-\d+-\d+/)[0]);
+
+        var inl = t.match(/\d+/)[0]*1;
+        var iva = t.match(/(?<=\()\d+/)[0]*1;
+
+        return [date,inl,iva,raw];
+  }
+}
+
+
+class Vasternorrland extends Scraper{
+		_baseUrl = "https://www.rvn.se/sv/Vard-o-halsa/coronavirus---for-dig-som-vill-veta-mer/";
+
+	get name() {
+    return 'Västernorrland';
+  }
+
+  parse(xmlDoc){
+        var t = xmlDoc.evaluate('//*[@id="main"]/div[1]/div/section/div/p', xmlDoc);
+        t.iterateNext();
+
+        var raw ="";
+        var inl = t.iterateNext().innerText;
+        raw += inl;
+        inl = inl.match(/\d+/)[0]*1;
+
+        var iva = t.iterateNext().innerText;
+        raw += iva;
+        iva = iva.match(/\d+/)[0]*1;
+
+        t.iterateNext();
+        var date = t.iterateNext().innerText;
+        raw += date;
+        date = moment(date.match(/(\d+ \w+)/)[0]);
+
+        return [date,inl,iva,raw,this.url];
+  }
+}
+
+
+
+class Orebro extends Scraper{
+    _baseUrl = 'https://www.regionorebrolan.se/';
+
+	get name() {
+    return 'Örebro';
+  }
+
+  parse(xmlDoc){
+        var t=xmlDoc.evaluate('//*[@id="teasers"]/div[1]/div/p[4]/a', xmlDoc);
+        var i;
+        do{
+            i = t.iterateNext();
+        }while(!i.innerText.trim().startsWith("Lägesbild"));
+
+       var t = new OrebroSub(i.href);
+
+       return t.scrape();
+
+  }
+}
+
+
+class OrebroSub extends Scraper{
+
+  parse(xmlDoc){
+        var t = xmlDoc.evaluate('//*[@id="article-inner"]/div[@class="point-area"]/*', xmlDoc);
+
+        var raw="",i,date,inl,iva;
+        while(i = t.iterateNext()){
+        	raw += i.innerText;
+
+        	var m = [...i.innerText.matchAll(/Lägesrapport\D+(\d+ \w+)/gi)];
+        	if(m.length){
+        	    date = m[0][1];
+        	    continue;
+        	}
+
+        	m = [...i.innerText.matchAll(/Antalet inlagda på sjukhus: (\d+)/gi)];
+        	if(m.length){
+        	    inl = m[0][1]*1;
+        	}
+        	
+        	m = [...i.innerText.matchAll(/Antal som ligger på intensivvårdsavdelning: (\d+)/gi)];
+        	if(m.length){
+        	    iva = m[0][1]*1;
+        	}
+        };
+
+        var raw = raw.substr(0,300);
+        var date = moment(date);
+                
+        return [date,inl,iva,raw,this.url];
+  }
+}
+
+
+
+class Ostergotland extends Scraper{
+    _baseUrl = 'https://www.regionostergotland.se/Halsa-och-vard/aktuellt-om-coronaviruset/';
+
+  	get name() {
+    return 'Östergötland';
+  }
+
+
+  parse(xmlDoc){
+        var t = xmlDoc.evaluate('//*[contains(@class,"mainbodycontent")]/*',xmlDoc);
+
+        var raw="",i,date,inl,iva;
+        while(i = t.iterateNext()){
+
+        	var m = [...i.innerText.matchAll(/[\wåäö]+ (\d+ \w+) klockan/g)];
+        	if(m.length){
+            	raw += i.innerText;
+        	    date = m[0][1];
+        	    continue;
+        	}
+
+        	if(i.innerText.match(/isolerade på sjukhus/)){
+            	raw += i.innerText;
+        	    inl = [...i.innerText.matchAll(/(\d+) (patienter )?på vårdavdelning/g)].reduce((a,b)=>a+b[1]*1,0);
+        	    iva = [...i.innerText.matchAll(/(\d+) i intensivvård/g)].reduce((a,b)=>a+b[1]*1,0);
+        	    inl +=iva;
+        	    break;
+        	}
+        };
+
+        var raw = raw.substr(0,300);
+        var date = moment(date);
+                
+        return [date,inl,iva,raw,this.url];
+  }
+}
+
+
+
+class Dalarna extends Scraper{
+    _baseUrl = 'https://www.regiondalarna.se/';
+
+	get name() {
+    return 'Dalarna';
+  }
+
+  parse(xmlDoc){
+        var t=xmlDoc.evaluate('//*[@id="pills-news"]/div/a', xmlDoc);
+        var i;
+        do{
+            i = t.iterateNext();
+        }while(i.href.indexOf("lagesrapport-covid")===-1);
+
+       var t = new DalarnaSub(i.href);
+
+       return t.scrape();
+
+  }
+}
+
+
+class DalarnaSub extends Scraper{
+    _baseUrl='https://www.regiondalarna.se';
+
+  parse(xmlDoc){
+        var t = xmlDoc.evaluate('/html/body/main/div/div[2]/div[1]/div/h1', xmlDoc).iterateNext().innerText;
+
+        var raw=t.innerText;
+        var date = moment(t.match(/(?<=: )\d+ \w+/)[0]);
+
+        t = xmlDoc.evaluate('/html/body/main/div/div[2]/div[1]/div/ul[1]/li', xmlDoc);
+
+        var i, inl, iva;
+        while(i = t.iterateNext()){
+        	raw += i.innerText;
+
+        	var m = [...i.innerText.matchAll(/vårdavdelning på falu\s+lasarett: (\d+)/gi)];
+        	if(m.length){
+        	    inl = m[0][1]*1;
+        	    continue;
+        	}
+        	
+        	m = [...i.innerText.matchAll(/som får intensivvård: (\d+)/gi)];
+        	if(m.length){
+        	    iva = m[0][1]*1;
+        	    inl +=iva;
+        	    break;
+        	}
+        };
+
+        var raw = raw.substr(0,300);
+                
+        return [date,inl,iva,raw,this.url];
+  }
+}
+
+
+
+class Stockholm extends Scraper{
+	_baseUrl = 'https://www.sll.se/';
+
+	get name() {
+    return 'Stockholm';
+  }
+
+  parse(xmlDoc){
+        var a=xmlDoc.evaluate('//*[@id="main-content"]//a[contains(@href,"lagesrapport")]', xmlDoc).iterateNext();
+
+       var t = new StockholmSub(a.href);
+
+       return t.scrape();
+
+  }
+}
+
+
+class StockholmSub extends Stockholm{
+
+  parse(xmlDoc){
+        var t = xmlDoc.evaluate('//*[@id="first-content-container"]/header/h1', xmlDoc).iterateNext().innerText;
+
+        
+        var raw=t;
+        var date = moment(t.match(/\d+ \w+/)[0]);
+
+        t = xmlDoc.evaluate('//*[@id="first-content-container"]/div[1]', xmlDoc).iterateNext().innerText;
+
+        var inl = t.match(/(\d+) patienter med covid-19 vårdas i intensivvård vid akutsjukhus. Förutom de som får intensivvård är det (\d+)/);
+        var iva = inl[1]*1;
+        inl = inl[2]*1+iva;
+
+        var raw = (raw+t).substr(0,300);
+                
+        return [date,inl,iva,raw,this.url];
+  }
+}
+
+
+class Gavleborg extends Scraper{
+	_baseUrl = 'https://www.regiongavleborg.se/a-o/Smittskydd/A-Y/c/Coronavirus-2019-nCoV/statistik-covid-19/';
+	get name() {
+        return 'Gävleborg';
+      }
+
+  parse(xmlDoc){
+        var t = xmlDoc.evaluate('//div[contains(@class,"article__body__main")]/*', xmlDoc);
+
+        var raw="",i,date,inl,iva;
+        while(i = t.iterateNext()){
+        	raw += i.innerText;
+
+        	var m = [...i.innerText.matchAll(/Senast uppdaterad \d+.\d+ den (\d+ \w+)/g)];
+        	if(m.length){
+        	    date = m[0][1];
+        	    continue;
+        	}
+
+        	m = [...i.innerText.matchAll(/Antal inneliggande patienter bekräftade med covid-19:\s(\d+)/g)];
+        	if(m.length){
+        	    inl = m[0][1]*1;
+        	    continue;
+        	}
+        	
+        	m = [...i.innerText.matchAll(/Patienter som vårdas på intensiven med covid-19:\s(\d+)/g)];
+        	if(m.length){
+        	    iva = m[0][1]*1;
+        	    break;
+        	}
+        };
+
+        var raw = raw.substr(0,300);
+        var date = moment(date);
+                
+        return [date,inl,iva,raw,this.url];
+
+  }
+}
+
+
+
+
+
+/*
+var scrapers = [new Varmland(), new Halland(), new VG()];
+scrapers.forEach(x=>x.scrape())
+*/
+new Gavleborg().do();

@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Gotland extends Scraper{
     _baseUrl = 'https://www.gotland.se/nyhetsarkiv';
@@ -25,8 +28,7 @@ class Gotland extends Scraper{
 }
 
 
-class GotlandSub extends Gotland{
-
+class GotlandSub extends Gotland {
   parse(xmlDoc){
         var t=xmlDoc.evaluate('//*[@id="content"]/div[2]', xmlDoc);
         var raw = t.iterateNext().innerText.substr(0,1000);
@@ -81,3 +83,4 @@ class GotlandSub extends Gotland{
 }
 
 
+module.exports = Gotland

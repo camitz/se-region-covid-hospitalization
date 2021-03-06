@@ -1,4 +1,6 @@
-
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class VG2 extends Scraper{
     _baseUrl = 'https://e.infogram.com/1pyyqv6pym1kd0c3w23qk6jj0ety91y3nwp?src=embed';
@@ -69,3 +71,5 @@ class VG extends Scraper{
         return [date,inl,iva,raw,this.url];
   }
 }
+
+module.exports = VG2

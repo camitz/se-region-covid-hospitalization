@@ -1,4 +1,6 @@
-
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Sormland extends Scraper{
     _baseUrl = 'https://regionsormland.se/halsa-vard/information-om-coronaviruset-covid-19/';
@@ -30,3 +32,5 @@ class Sormland extends Scraper{
         return [date,inl,iva,raw];
   }
 }
+
+module.exports = Sormland

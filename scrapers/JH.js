@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class JH extends Scraper{
     _baseUrl = 'https://www.regionjh.se/';
@@ -55,3 +58,4 @@ class JHSub extends JH{
         throw "Fel";
   }
 }
+module.exports = JH

@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Dalarna extends Scraper{
     _baseUrl = 'https://www.regiondalarna.se/';
@@ -62,3 +65,4 @@ class DalarnaSub extends Dalarna{
 }
 
 
+module.exports = Dalarna

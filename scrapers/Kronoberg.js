@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Kronoberg extends Scraper{
     _baseUrl = 'http://www.regionkronoberg.se/corona';
@@ -26,3 +29,4 @@ class Kronoberg extends Scraper{
   }
 }
 
+module.exports = Kronoberg

@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Vasternorrland extends Scraper{
 		//_baseUrl = "https://www.rvn.se/sv/Vard-o-halsa/coronavirus---for-dig-som-vill-veta-mer/statistik-och-fakta/";
@@ -59,3 +62,4 @@ class Vasternorrland extends Scraper{
         return [date,inl,iva,raw,this.url];
   }
 }
+module.exports = Vasternorrland

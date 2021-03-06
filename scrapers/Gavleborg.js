@@ -1,3 +1,8 @@
+const Scraper = require('../scraper')
+const AWS = require('aws-sdk')
+require('../awsCreds.js')(AWS)
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Gavleborg extends Scraper{
     _baseUrl = '';
@@ -86,3 +91,4 @@ class Gavleborg extends Scraper{
 }*/
 
 //From: <karin.josefsson@regiongavleborg.se>
+module.exports = Gavleborg

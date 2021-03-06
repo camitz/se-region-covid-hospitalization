@@ -1,3 +1,7 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
+const pdfjsLib = require('pdfjs-dist')
 
 class Norrbotten extends Scraper{
     _baseUrl = 'https://www.google.com/';
@@ -416,4 +420,4 @@ class Norrbotten2Sub extends Scraper{
   //    context.strokeStyle = '#003300';
     //  context.stroke();
   }
-}
+}module.exports = Norrbotten

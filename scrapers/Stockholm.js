@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Stockholm extends Scraper{
 	_baseUrl = 'https://www.sll.se/Nyheter';
@@ -69,3 +72,4 @@ class StockholmDagslage extends Stockholm{
         return [date,inl,iva,raw,this.url];
   }
 }
+module.exports = Stockholm

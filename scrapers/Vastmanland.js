@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Vastmanland extends Scraper{
 //    _baseUrl = 'https://regionvastmanland.se/uppdateringar-fran-region-vastmanland-om-covid-19/lagesbild-arkiverad/';
@@ -108,3 +111,4 @@ class Vastmanland2 extends Scraper{
 			});
   }
 }
+module.exports = Vastmanland

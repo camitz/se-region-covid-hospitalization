@@ -1,4 +1,6 @@
-
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Varmland extends Scraper{
     _baseUrl = 'https://www.regionvarmland.se/halsa-och-vard/coronavirus---covid-19/aktuellt-lage-i-varmland--covid-19/';
@@ -113,3 +115,5 @@ class Varmland extends Scraper{
   }
 }
 */
+
+module.exports = Varmland

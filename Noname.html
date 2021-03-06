@@ -1,20 +1,6 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<script
-  src="https://code.jquery.com/jquery-3.4.1.min.js"
-  integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
-  crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment-with-locales.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-csv/1.0.9/jquery.csv.min.js"></script>
-<script src="https://npmcdn.com/pdfjs-dist/build/pdf.js"></script>
-<script src="https://sdk.amazonaws.com/js/aws-sdk-2.701.0.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.5.0/jszip.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip-utils/0.1.0/jszip-utils.min.js" integrity="sha512-3WaCYjK/lQuL0dVIRt1thLXr84Z/4Yppka6u40yEJT1QulYm9pCxguF6r8V84ndP5K03koI9hV1+zo/bUbgMtA==" crossorigin="anonymous"></script>
-<script src="jsfft/lib/complex_array.js"></script>
-<script src="jsfft/lib/fft.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/jszip.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.8.0/xlsx.js"></script>
 
 <style>
 #norrbottenimg,#uppsalaimg{position:absolute;z-index:1;}
@@ -75,31 +61,19 @@
     <canvas id="norrbottencanvas"></canvas>
 </div>
 
-<script src="scraper.js"></script>
+<script>
+String.prototype.b64DecodeUnicode = function() {
+		// Going backwards: from bytestream, to percent-encoding, to original string.
+		return decodeURIComponent(atob(this.replace("?=","")).split('').map(function(c) {
+			return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+		}).join(''));
+	};
 
-<script src="scrapers/Blekinge.js"></script>
-<script src="scrapers/Dalarna.js"></script>
-<script src="scrapers/Gavleborg.js"></script>
-<script src="scrapers/Gotland.js"></script>
-<script src="scrapers/Halland.js"></script>
-<script src="scrapers/JH.js"></script>
-<script src="scrapers/Jonkoping.js"></script>
-<script src="scrapers/Kalmar.js"></script>
-<script src="scrapers/Kronoberg.js"></script>
-<script src="scrapers/Norrbotten.js"></script>
-<script src="scrapers/Orebro.js"></script>
-<script src="scrapers/Ostergotland.js"></script>
-<script src="scrapers/Skane.js"></script>
-<script src="scrapers/Sormland.js"></script>
-<script src="scrapers/Stockholm.js"></script>
-<script src="scrapers/Uppsala.js"></script>
-<script src="scrapers/VG.js"></script>
-<script src="scrapers/Varmland.js"></script>
-<script src="scrapers/Vasterbotten.js"></script>
-<script src="scrapers/Vasternorrland.js"></script>
-<script src="scrapers/Vastmanland.js"></script>
 
-<script src="scraperApp.js"></script>
+
+</script>
+
+<script src="bundle.js"></script>
 
 </body>
 </html>

@@ -1,3 +1,8 @@
+const Scraper = require('../scraper')
+const AWS = require('aws-sdk')
+require('../awsCreds.js')(AWS)
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Ostergotland extends Scraper{
     _baseUrl = '';
@@ -144,3 +149,4 @@ class Ostergotland extends Scraper{
   }
 }
 */
+module.exports = Ostergotland

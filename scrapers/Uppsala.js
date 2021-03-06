@@ -1,3 +1,9 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
+const JSZipUtils = require('jszip-utils')
+const XLSX = require('xlsx')
+const pdfjsLib = require('pdfjs-dist')
 
 class Uppsala extends Scraper{
     _baseUrl = 'https://via.tt.se/json/v2/releases?publisher=3235664';
@@ -256,3 +262,4 @@ class Uppsala2Sub extends Scraper{
     //  context.stroke();
   }
 }
+module.exports = Uppsala2

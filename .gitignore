@@ -1,2 +1,4 @@
 node_modules
 *.bak
+awsCreds.js
+bundle.js

@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Halland extends Scraper{
     _baseUrl = 'https://www.regionhalland.se/om-region-halland/smittskydd/information-om-det-nya-coronaviruset/laget-i-halland-covid-19/';
@@ -28,3 +31,4 @@ class Halland extends Scraper{
         return [date,inl,iva,raw];
   }
 }
+module.exports = Halland

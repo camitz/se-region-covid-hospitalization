@@ -1,3 +1,7 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
+$.csv = require('jquery-csv')
 
 class Vasterbotten extends Scraper{
     _baseUrl = 'https://coronarapportering.regionvasterbotten.se/CoronaRVBuppdat.csv';
@@ -28,3 +32,4 @@ class Vasterbotten extends Scraper{
   }
 }
 
+module.exports = Vasterbotten

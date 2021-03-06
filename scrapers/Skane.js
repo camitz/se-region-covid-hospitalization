@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 
 class Skane extends Scraper{
@@ -107,3 +110,4 @@ class SkaneDaily extends Skane{
   }
 }
 
+module.exports = Skane

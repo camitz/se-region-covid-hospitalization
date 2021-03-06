@@ -1,3 +1,6 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 
 class Blekinge extends Scraper{
@@ -7,7 +10,7 @@ class Blekinge extends Scraper{
     return 'Blekinge';
   }
 
-  parse(xmlDoc){
+  parse(xmlDoc) {
         var raw = xmlDoc.evaluate('//*[@id="svid12_2cd827be170f3b15ca913afb"]/div[2]//table', xmlDoc).iterateNext();
         raw = "<table>"+raw.innerHTML+"</table>";
 
@@ -25,3 +28,4 @@ class Blekinge extends Scraper{
   }
 }
 
+module.exports = Blekinge

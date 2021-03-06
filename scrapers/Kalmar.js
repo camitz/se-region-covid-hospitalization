@@ -1,3 +1,7 @@
+const Scraper = require('../scraper')
+const $ = require('jquery');
+const moment = require('../moment.js')
+const pdfjsLib = require('pdfjs-dist')
 
 class Kalmar extends Scraper{
 	_baseUrl = 'https://www.regionkalmar.se/globalassets/covid19_regionwebben.pdf';
@@ -64,3 +68,4 @@ class Kalmar extends Scraper{
   }
 }
 */
+module.exports = Kalmar

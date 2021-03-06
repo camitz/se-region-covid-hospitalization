@@ -1,3 +1,8 @@
+const Scraper = require('../scraper')
+const AWS = require('aws-sdk')
+require('../awsCreds.js')(AWS)
+const $ = require('jquery');
+const moment = require('../moment.js')
 
 class Orebro extends Scraper{
     _baseUrl = '';
@@ -138,4 +143,4 @@ class Orebro extends Scraper{
 
   }
 }
-*/
+*/module.exports = Orebro

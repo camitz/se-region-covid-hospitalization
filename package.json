@@ -4,6 +4,7 @@
   "main": "app.js",
   "dependencies": {
     "aws-sdk": "^2.858.0",
+    "fs": "0.0.1-security",
     "jquery": "^3.6.0",
     "jquery-csv": "^1.0.11",
     "jsfft": "0.0.4",

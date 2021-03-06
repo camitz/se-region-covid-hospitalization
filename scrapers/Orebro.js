@@ -3,6 +3,7 @@ const AWS = require('aws-sdk')
 require('../awsCreds.js')(AWS)
 const $ = require('jquery');
 const moment = require('../moment.js')
+const libxmljs = require('libxmljs')
 
 class Orebro extends Scraper{
     _baseUrl = '';
@@ -26,7 +27,7 @@ class Orebro extends Scraper{
 				var from = objs.map(x=>x.Body.toString().match(/From:\s.*/i)[0]);
 				var subjectRegex = /Subject: =\?utf-8\?B\?(.+)/;
 				var t = objs.filter(x=>x.Body.toString().match(subjectRegex))
-				    .filter(x=>x.Body.toString().match(subjectRegex)[1].b64DecodeUnicode().match(/Beläggningsstatistik för Region Ö/));
+				    .filter(x=>this.b64DecodeUnicode(x.Body.toString().match(subjectRegex)[1]).match(/Beläggningsstatistik för Region Ö/));
 				t = t.sort((a,b)=>a.LastModified<b.LastModified?1:-1);
 				t=t[0].Body.toString();
 				var raw = [...atob(t.match(/Content-Type: application\/octet-stream; name="Belaggning.csv"[\s\S]+[\n\r]{4}([\s\S]+)----/m)[1].trim())].filter(x=>x.charCodeAt(0)!==0)

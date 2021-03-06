@@ -26,7 +26,7 @@ class Ostergotland extends Scraper{
 				var subjectRegex = /Subject: =\?utf-8\?B\?(.+)/;
 				var t = objs.filter(x=>{
 					    let m = x.Body.toString().match(subjectRegex);
-					    return m && /RegionOstergotland Covid19/.test(m[1].b64DecodeUnicode())
+					    return m && /RegionOstergotland Covid19/.test(this.b64DecodeUnicode(m[1]))
 					});
 				t = t.sort((a,b)=>a.LastModified<b.LastModified?1:-1);
 				t=t.filter(x=>x.Body.toString().indexOf("DatumNyckel;Kön")!==-1)

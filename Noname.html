@@ -2,24 +2,7 @@
 <head>
 <meta charset="UTF-8">
 
-<style>
-#norrbottenimg,#uppsalaimg{position:absolute;z-index:1;}
-
-#container,#uppsalacontainer{
-    /* display:inline-block; */
-    position: relative;
-    border:2px solid black;
-    }
-
-#norrbottencanvas,#uppsalacanvas{
-    position: absolute;
-    top: 0;
-    z-index:20;
-    left: 0;
-}
-
-
-</style>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -61,17 +44,7 @@
     <canvas id="norrbottencanvas"></canvas>
 </div>
 
-<script>
-String.prototype.b64DecodeUnicode = function() {
-		// Going backwards: from bytestream, to percent-encoding, to original string.
-		return decodeURIComponent(atob(this.replace("?=","")).split('').map(function(c) {
-			return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-		}).join(''));
-	};
 
-
-
-</script>
 
 <script src="bundle.js"></script>
 

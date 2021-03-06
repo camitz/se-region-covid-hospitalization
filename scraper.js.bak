@@ -1,7 +1,7 @@
 const jQuery = require('jquery');
 const $=jQuery;
 const moment = require('./moment.js')
-const pdfjsLib = require('pdfjs')
+const pdfjsLib = require('pdfjs-dist')
 
 
 $.ajaxPrefilter( function (options) {

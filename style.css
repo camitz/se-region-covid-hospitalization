@@ -1,0 +1,14 @@
+#norrbottenimg,#uppsalaimg{position:absolute;z-index:1;}
+
+#container,#uppsalacontainer{
+    /* display:inline-block; */
+    position: relative;
+    border:2px solid black;
+    }
+
+#norrbottencanvas,#uppsalacanvas{
+    position: absolute;
+    top: 0;
+    z-index:20;
+    left: 0;
+}

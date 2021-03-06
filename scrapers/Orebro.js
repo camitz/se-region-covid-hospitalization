@@ -3,7 +3,6 @@ const AWS = require('aws-sdk')
 require('../awsCreds.js')(AWS)
 const $ = require('jquery');
 const moment = require('../moment.js')
-const libxmljs = require('libxmljs')
 
 class Orebro extends Scraper{
     _baseUrl = '';

@@ -80,7 +80,7 @@ class ScraperApp {
 		new scrapers.Skane(),
 		new scrapers.Sormland(),
 		new scrapers.Stockholm(),
-		new scrapers.Uppsala2(),
+//		new scrapers.Uppsala2(),
 		new scrapers.VG2(),
 		new scrapers.Varmland(),
 		new scrapers.Vasterbotten(),

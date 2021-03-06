@@ -2,6 +2,7 @@ const Scraper = require('../scraper')
 const $ = require('jquery');
 const moment = require('../moment.js')
 const pdfjsLib = require('pdfjs-dist')
+const jsfft = require('jsfft')
 
 class Norrbotten extends Scraper{
     _baseUrl = 'https://www.google.com/';

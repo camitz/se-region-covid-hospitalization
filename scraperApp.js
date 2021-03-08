@@ -35,7 +35,7 @@ class ScraperApp {
 	    document.querySelector("#inls thead").innerHTML = "<th>datum</th>"+hRow.join("");
 	    document.querySelector("#ivas thead").innerHTML = "<th>datum</th>"+hRow.join("");
 
-	    var i = 0, d = moment(dateRange[0]); 
+	    var i = 0, d = moment(dateRange[0]);
         while(d.isSameOrBefore(dateRange[1], 'day')){
     		var rowInl = document.createElement('tr');
     		var rowIva = document.createElement('tr');
@@ -56,7 +56,7 @@ class ScraperApp {
     		});
 
 			document.querySelector("#inls tbody").appendChild(rowInl);
-			document.querySelector("#ivas tbody").appendChild(rowIva);            
+			document.querySelector("#ivas tbody").appendChild(rowIva);
 
 			d.add(1,"days");
 	    }
@@ -89,7 +89,7 @@ class ScraperApp {
 		 ];
 
 
-//		var allScrapers = [new scrapers.Vasterbotten()];
+		var allScrapers = [new scrapers.Vasterbotten()];
 		//var scrapers = [new Vasternorrland()];
 
 		//scrapers.forEach(x=>x.do())

@@ -3,15 +3,15 @@ const $=jQuery;
 const moment = require('./moment.js')
 const pdfjsLib = require('pdfjs-dist')
 
-
-$.ajaxPrefilter( function (options) {
-  if (options.crossDomain && jQuery.support.cors) {
-	var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-	//var providers = ['//cors-anywhere.herokuapp.com/',"//cors-proxy.htmldriven.com/?url=","//cors.corsproxy.io/url=","//thingproxy.freeboard.io/fetch/"];
-	//options.url = http + providers[3] + options.url;
-	options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
-  }
-});
+if (typeof $.ajaxPrefilter !== 'undefined')
+	$.ajaxPrefilter( function (options) {
+	  if (options.crossDomain && jQuery.support.cors) {
+		var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
+		//var providers = ['//cors-anywhere.herokuapp.com/',"//cors-proxy.htmldriven.com/?url=","//cors.corsproxy.io/url=","//thingproxy.freeboard.io/fetch/"];
+		//options.url = http + providers[3] + options.url;
+		options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
+	  }
+	});
 
 class Scraper{
 	constructor(url){

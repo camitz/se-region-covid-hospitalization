@@ -2,7 +2,7 @@ const Scraper = require('../scraper')
 const $ = require('jquery');
 const moment = require('../moment.js')
 const pdfjsLib = require('pdfjs-dist')
-const jsfft = require('jsfft')
+const fft  = require('jsfft')
 
 class Norrbotten extends Scraper{
     _baseUrl = 'https://www.google.com/';
@@ -360,7 +360,7 @@ class Norrbotten2Sub extends Scraper{
 
   fftAnalyse(data, column, size, shift=0){
         var a = data.slice(0+shift,size+shift).map(x=>x[column]);
-        var fftA = new ComplexArray(size).map((value, i, n) =>value.real = a[i]).FFT();
+        var fftA = new fft.ComplexArray(size).map((value, i, n) =>value.real = a[i]).FFT();
         var fA = [...Array(size)].map((x,i)=>Math.sqrt(Math.pow(fftA.real[i],2)+Math.pow(fftA.imag[i],2)));
         fA= {fA: fA, s:[...Array(size).keys()].sort((a,b)=>fA[b]-fA[a]), shift:shift};
         fA.p = fA.s.map(x=>size/x);

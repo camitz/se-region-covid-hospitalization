@@ -19,7 +19,10 @@ class Norrbotten extends Scraper{
            weekly.scrape().then(function(v){
            	[this.dates,this.ivas,this.inls]=[weekly.dates,weekly.ivas,weekly.inls];
            	return v;
-           }.bind(this),weekly), (new NorrbottenDaily()).scrape()
+           }.bind(this),
+			   function(e){ return null }, 
+			   weekly), 
+			(new NorrbottenDaily()).scrape()
        ]).then(values=>{
        	console.log(values);
        	return values[1];

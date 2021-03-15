@@ -37,7 +37,7 @@ class DalarnaSub extends Dalarna{
         //t = xmlDoc.evaluate('//*[@id="main-content"]//div[@class="article"]//p', xmlDoc);
         t = xmlDoc.evaluate('//*[@id="main-content"]//div[@class="article"]//li', xmlDoc);//1 sept
 
-        var i, inl, iva;
+        var i, inl=0, iva=0;
         while(i = t.iterateNext()){
         	raw += i.innerText;
 
@@ -51,8 +51,7 @@ class DalarnaSub extends Dalarna{
         	//m = [...i.innerText.matchAll(/som får intensivvård:\s+(\d+)/gi)];
         	m = [...i.innerText.matchAll(/intensivvårdsavdelning \w+:\s+(\d+)/gi)];//30 april
         	if(m.length){
-        	    iva = m[0][1]*1;
-        	    inl +=iva;
+        	    iva += m[0][1]*1;
         	    continue;
         	}
         };
@@ -60,7 +59,7 @@ class DalarnaSub extends Dalarna{
 
         var raw = raw.substr(0,300);
                 
-        return [date,inl,iva,raw,this.url];
+        return [date,inl+iva,iva,raw,this.url];
   }
 }
 

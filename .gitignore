@@ -2,3 +2,4 @@ node_modules
 *.bak
 awsCreds.js
 bundle.js
+package-lock.json

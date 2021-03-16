@@ -7,6 +7,7 @@
     "fs": "0.0.1-security",
     "jquery": "^3.6.0",
     "jquery-csv": "^1.0.11",
+    "jsdom": "^16.5.0",
     "jsfft": "0.0.4",
     "jszip": "^3.6.0",
     "jszip-utils": "^0.1.0",

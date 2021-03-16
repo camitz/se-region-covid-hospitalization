@@ -89,8 +89,7 @@ class ScraperApp {
 		 ];
 
 
-		var allScrapers = [new scrapers.Vasterbotten()];
-		//var scrapers = [new Vasternorrland()];
+//		var allScrapers = [new scrapers.Uppsala2()];
 
 		//scrapers.forEach(x=>x.do())
 
@@ -103,4 +102,9 @@ class ScraperApp {
     }
 }
 
-new ScraperApp().scrapeAll();
+if (typeof window !== 'undefined')
+{
+	window.ScraperApp = ScraperApp
+}
+
+module.exports = ScraperApp

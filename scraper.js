@@ -13,10 +13,18 @@ if (typeof $.ajaxPrefilter !== 'undefined')
 	  }
 	});
 
+
+var WIN, corsproxy='//cors-anywhere.herokuapp.com/';
+
+if (typeof document !== 'undefined' && document)
+{
+	WIN = window;
+}
+
 class Scraper{
 	constructor(url){
 		if(url) {
-			var a = document.createElement('a');
+			var a = WIN.document.createElement('a');
 			a.href=url;
 			if(a.protocol=="file:") {
     			var m = a.pathname.match(/(?<=:)\/.+/);
@@ -26,11 +34,16 @@ class Scraper{
 				this._baseUrl = url;
 			}
 		}
+		
+		if(typeof global !== 'undefined' && global.window){
+			WIN = global.window;
+			corsproxy = "";
+		}
 	}
 
 	get url(){
 		if(this._path){
-			var a = document.createElement('a');
+			var a = WIN.document.createElement('a');
 			a.href=this._baseUrl;
 			if(!this._path.startsWith("http")){
                 this._baseUrl = `${a.protocol}//${a.host}/${this._path}`;
@@ -60,8 +73,10 @@ class Scraper{
 	scrape(){
 		var me = this;
 		var url = this.url;
-		var http = (window.location.protocol === 'http:' ? 'http:' : 'https:');
-		url = http + '//cors-anywhere.herokuapp.com/' + url;
+		var http = (WIN.location.protocol === 'http:' ? 'http:' : 'https:');
+		if(corsproxy)
+			corsproxy = http + corsproxy;
+		url = corsproxy + url;
 
 		if(this.url.endsWith(".pdf")){			
 			if(me.getpdfelements)
@@ -133,21 +148,21 @@ class Scraper{
     }
 
      produceRow(result){
-     	var row = document.createElement('tr');
+     	var row = WIN.document.createElement('tr');
 			row.innerHTML = `<td>${this.name}</td>`;
 				var date,iva,inl,raw,t,url;   
         	[date, inl, iva, raw,url] = result;
             row.innerHTML += `<td>${date.format('D MMMM').replace(" ","&nbsp;")}</td><td>${inl}</td><td>${iva}</td><td>${raw}</td>`;
     		row.innerHTML += `<td><a href="${url?url:this.url}">${url?url:this.url}</td>`;
-            document.getElementById("p").appendChild(row);		
+            WIN.document.getElementById("p").appendChild(row);		
      }
 
      produceError(result){
-     	var row = document.createElement('tr');
+     	var row = WIN.document.createElement('tr');
 			row.innerHTML = `<td>${this.name}</td>`;
     		row.innerHTML += `<td>Fel!</td><td>${result}</td><td></td><td></td>`;
     		row.innerHTML += `<td><a href="${this.url}">${this.url}</td>`;
-            document.getElementById("p").appendChild(row);		
+            WIN.document.getElementById("p").appendChild(row);		
             console.error(result);
      }
 

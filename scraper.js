@@ -37,7 +37,7 @@ class Scraper{
 		
 		if(typeof global !== 'undefined' && global.window){
 			WIN = global.window;
-			corsproxy = "";
+			//corsproxy = "";
 		}
 	}
 

@@ -15,7 +15,7 @@ class Sormland extends Scraper{
         var raw,t1,i;
         while(i=t.iterateNext()) {
         	raw = i.innerText;
-            t1 = [...raw.matchAll(/(\d\d?\s+\w+):\s(\d+).+?\.\s\s?Av dessa får ([a-zåäö]+|\d+)/gi)];
+            t1 = [...raw.matchAll(/(\d\d?\s+\w+):\s(\d+).+?\.\s\s?Av dessa får\s([a-zåäö]+|\d+)/gi)];
             if(t1.length)
                 break;
         }

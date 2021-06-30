@@ -75,8 +75,7 @@ class Scraper{
 		var url = this.url;
 		var http = (WIN.location.protocol === 'http:' ? 'http:' : 'https:');
 		if(corsproxy)
-			corsproxy = http + corsproxy;
-		url = corsproxy + url;
+			url = http + corsproxy + this.url;
 
 		if(this.url.endsWith(".pdf")){			
 			if(me.getpdfelements)

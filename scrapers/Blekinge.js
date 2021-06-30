@@ -12,7 +12,7 @@ class Blekinge extends Scraper{
 
   parse(xmlDoc) {
         var raw = xmlDoc.evaluate('//*[@id="svid12_2cd827be170f3b15ca913afb"]/div[2]//table', xmlDoc).iterateNext();
-        raw = "<table>"+raw.innerHTML+"</table>";
+        raw = raw.innerText;
 
         var node = xmlDoc.evaluate('//*[@id="svid12_2cd827be170f3b15ca913afb"]/div[2]//table/tbody/tr/td', xmlDoc);
         var t = node.iterateNext();

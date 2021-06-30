@@ -38,7 +38,7 @@ class Vastmanland extends Scraper{
         };
 
         var raw = raw.substr(0,400);
-        var date = moment(date, "DD MMM");
+        var date = moment(date, "DD MMM").add(1,"days");
         var inls = dataObject.data2.map((x,i)=>f(x)/*+f(dataObject.data3[i])*/+f(dataObject.data1[i]));
         var ivas = dataObject.data2.map((x,i)=>f(x)/*+f(dataObject.data3[i]*/);
 
@@ -81,7 +81,7 @@ class Vastmanland2 extends Scraper{
                 try {
 					var raw = [...t.matchAll(/Dagens rapport ([\d-]+)/gi)][0][0];
 					var date = [...t.matchAll(/Dagens rapport ([\d-]+)/gi)][0][1];
-					date = moment(date);
+					date = moment(date).add(1, 'days');
 
 					var inl = [...t.matchAll(/har idag (\d+) st inlagda varav (\d+)/gi)][0];
 					raw += inl[0];
@@ -99,14 +99,14 @@ class Vastmanland2 extends Scraper{
 
                     p = t.findIndex(s=>s.match(/^\d{4}-\d{2}-\d{2}/gi), 0);
                 	while(p>-1) {
-                        this.dates.push(moment(t[p]));
+                        this.dates.push(moment(t[p]).add(1,'days'));
                         this.inls.push(t[p+1]*1);
                         this.ivas.push(t[p+2]*1);
                         t.splice(p,3);
                         p = t.findIndex(s=>s.match(/^\d{4}-\d{2}-\d{2}/gi));
                 	}
 
-					return [this.dates[this.dates.length-1], this.inls[this.inls.length-1], this.ivas[this.ivas.length-1], raw];                	
+					return [this.dates[this.dates.length-1], this.inls[this.inls.length-1], this.ivas[this.ivas.length-1], ""];                	
                 }
 			});
   }

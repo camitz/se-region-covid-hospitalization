@@ -32,7 +32,9 @@ class VG2 extends Scraper{
             this.inls = dataObject.map(x=>x[1]*1);
             this.ivas = dataObject.map(x=>x[2]*1);
 
-			return [this.dates[l-1],this.inls[l-1],this.ivas[l-1],JSON.stringify(dataObject).replaceAll("SAKNAS","na").replaceAll("#na!","na"),
+			var raw = JSON.stringify(dataObject).replaceAll("SAKNAS","na").replaceAll("#na!","na");
+
+			return [this.dates[l-1],this.inls[l-1],this.ivas[l-1],"",
 			        this.url, i.innerText,this.dates,
 				this.inls,
 				this.ivas,

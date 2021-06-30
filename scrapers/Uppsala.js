@@ -40,9 +40,9 @@ class Uppsala2 extends Scraper{
   }
 
   parse(xmlDoc){
-        var a=xmlDoc.evaluate('//*[@id="app"]//a[contains(@href,"nulagesbild-covid-19-region-uppsala-excel")]', xmlDoc).iterateNext();
-        if(!a)
-            a=xmlDoc.evaluate('//*[@id="app"]//a[contains(@href,"covid-19-excel")]', xmlDoc).iterateNext();
+       var a=xmlDoc.evaluate('//*[@id="app"]//a[contains(@href,"nulagesbild-covid-19-region-uppsala.xlsx")]', xmlDoc).iterateNext();
+//        if(!a)
+  //          a=xmlDoc.evaluate('//*[@id="app"]//a[contains(@href,"covid-19-excel")]', xmlDoc).iterateNext();
 
        var t = new Uppsala3Sub(a.href.replace("file:///C:/","https://regionuppsala.se/"));
 
@@ -82,7 +82,7 @@ class Uppsala3Sub extends Scraper{
         type: 'binary'
       });
 
-        var json = XLSX.utils.sheet_to_json(workbook.Sheets["Slutenvård per dag"], {range:2});
+        var json = XLSX.utils.sheet_to_json(workbook.Sheets["Slutenvård"], {range:2});
         this.dates = json.map(x=>moment(x.Datum));
         this.inls = json.map(x=>1*x["Antal patienter"]);
         this.ivas = json.map(x=>1*x["Antal vårdade IVA"]);

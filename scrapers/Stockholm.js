@@ -15,11 +15,15 @@ class Stockholm extends Scraper{
 
        var me = this;
   	   var lagesrapport = new StockholmLagesrapport(a.href);
-  	   var dagssrapport = new StockholmDagslage(a1.href);
+  	   var dagssrapport = new StockholmDagslage(a1?.href);
   	    
-       return Promise.all([lagesrapport.scrape(), dagssrapport.scrape()])
+       return Promise.allSettled([lagesrapport.scrape(), dagssrapport.scrape()])
        .then(values=>{
-       	    return values[0][0].isBefore(values[1][0]) ? values[1] : values[0];
+		   if(values.every(x=>x.status=="rejected"))
+			   throw "error";
+ 		    values = values.map(x=>x.value);
+
+       	    return (!values[0] || values[0][0]?.isBefore(values[1] ? values[1][0] : null)) ? values[1] : values[0];
        });
 
 
@@ -30,7 +34,7 @@ class Stockholm extends Scraper{
 class StockholmLagesrapport extends Stockholm{
 
   parse(xmlDoc){
-        var t = xmlDoc.evaluate('//*[@id="first-content-container"]/header/h1', xmlDoc).iterateNext().innerText;
+        var t = xmlDoc.evaluate('//*[@id="main-content-heading"]', xmlDoc).iterateNext().innerText;
 
         
         var raw=t;
@@ -39,7 +43,7 @@ class StockholmLagesrapport extends Stockholm{
         t = xmlDoc.evaluate('//*[@id="first-content-container"]/div[1]', xmlDoc).iterateNext().innerText;
 
         //var inl = t.match(/(\d+) patienter med covid-19 vårdas i intensivvård vid akutsjukhus. Förutom de som får intensivvård är det (\d+)/);
-        var inl = t.match(/vårdas just nu ([a-zåäö0-9]+) patienter.*på akutsjukhus/i); 
+        var inl = t.match(/([a-zåäö0-9]+) på akutsjukhus/i);
         inl = this.ordinalOrNumber(inl[1]);
         var iva = t.match(/(\d+) i intensivvård/i); 
         iva = iva[1]*1;

@@ -41,7 +41,7 @@ class Orebro extends Scraper{
 			    this.inls = t.map(x=>x[1]*1+x[2]*1);
 			    this.ivas = t.map(x=>x[2]*1);
 
-			    return [date,inl,iva,raw];
+			    return [date,inl,iva,""];
 			});
   }
 }

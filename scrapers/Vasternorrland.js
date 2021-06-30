@@ -4,7 +4,9 @@ const moment = require('../moment.js')
 
 class Vasternorrland extends Scraper{
 		//_baseUrl = "https://www.rvn.se/sv/Vard-o-halsa/coronavirus---for-dig-som-vill-veta-mer/statistik-och-fakta/";
-		_baseUrl = "https://www.rvn.se/sv/Vard-o-halsa/coronavirus---covid-19/statistik-och-fakta/";
+		//_baseUrl = "https://www.rvn.se/sv/Vard-o-halsa/coronavirus---covid-19/statistik-och-fakta/";
+		_baseUrl = "https://www.rvn.se/sv/Vard-o-halsa/coronavirus---covid-19/";
+		
 
 	get name() {
     return 'Västernorrland';

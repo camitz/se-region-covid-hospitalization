@@ -20,18 +20,26 @@ class Ostergotland extends Scraper{
 
 		return s3.listObjectsV2({Bucket: 'fhmbelaggningse'}).promise().then(data=> {
 			  var items = data.Contents.filter(x=>moment(x.LastModified).add(7,'days').isAfter(moment())).map(x=>x.Key);
-			  return Promise.all(items.map(key=>s3.getObject({Bucket: 'fhmbelaggningse',Key:key}).promise()));
+			  return Promise.all(items.map(key=>s3.getObject({Bucket: 'fhmbelaggningse',Key:key}).promise().then(obj=>{return {key:key,obj:obj};})));
 			})
 			.then(objs=>{
 				var subjectRegex = /Subject: =\?utf-8\?B\?(.+)/;
-				var t = objs.filter(x=>{
-					    let m = x.Body.toString().match(subjectRegex);
+				var t0 = objs.filter(x=>{
+					    let m = x.obj.Body.toString().match(subjectRegex);
 					    return m && /RegionOstergotland Covid19/.test(this.b64DecodeUnicode(m[1]))
 					});
-				t = t.sort((a,b)=>a.LastModified<b.LastModified?1:-1);
-				t=t.filter(x=>x.Body.toString().indexOf("DatumNyckel;Kön")!==-1)
+
+				var t = t0.sort((a,b)=>a.obj.LastModified<b.obj.LastModified?1:-1);
+
+				if(moment().get("hours")<12)
+					t=t.filter(x=>moment(x.obj.LastModified)<moment().startOf('day'));
+
+				t=t.filter(x=>x.obj.Body.toString().indexOf("DatumNyckel;Kön;Sjukhus;Vårdnivå;")!==-1);
 				t=t[0];
-				t=t.Body.toString();
+				
+				var key = t.key;
+
+				t=t.obj.Body.toString();
                 var raw = t.substring(t.indexOf("DatumNyckel")).trim();
 
 			    t = raw.split("\n").map(x=>x.split(";"));
@@ -58,7 +66,9 @@ class Ostergotland extends Scraper{
 			    this.inls = t.map(x=>x[1]);
 			    this.ivas = t.map(x=>x[2]);
 
-			    return [date,inl,iva,t];
+				Promise.allSettled(t0.filter(x=>x.obj.Body.toString().indexOf("DatumNyckel;Kön;Sjukhus;Vårdnivå;")===-1).map(x=>s3.deleteObject({Bucket: 'fhmbelaggningse',Key:x.key}).promise())).then();
+
+			    return [date,inl,iva,""];
 			});
   }
 }

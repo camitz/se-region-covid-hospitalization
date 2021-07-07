@@ -49,9 +49,10 @@ class JHSub extends JH{
         
         t2 = [...t0.matchAll(/Smittade patienter under sjukhusvård just nu: (\d+)/g)][0];
         if(t2){
-        	var inl = t2[1]*1;
-            t2 = [...t0.matchAll(/st, varav (\d+) på IVA/gi)][0];
-            var iva = t2[1]*1
+        	var iva = 0, inl = t2[1]*1;
+            t2 = [...t0.matchAll(/st, varav (\d+) på IVA/gi)];
+			if(t2.length)
+				iva = t2[0][1]*1
             return [date,inl,iva,raw,this.url];        	
         }
 

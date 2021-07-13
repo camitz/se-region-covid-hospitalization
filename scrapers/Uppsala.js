@@ -82,8 +82,9 @@ class Uppsala3Sub extends Scraper{
         type: 'binary'
       });
 
+		var d = moment("1900-01-01").add(43888-1, "days");
         var json = XLSX.utils.sheet_to_json(workbook.Sheets["Slutenvård"], {range:2});
-        this.dates = json.map(x=>moment(x.Datum));
+        this.dates = json.map(x=>moment(d.add(x.Datum-43888-1,"days")));
         this.inls = json.map(x=>1*x["Antal patienter"]);
         this.ivas = json.map(x=>1*x["Antal vårdade IVA"]);
         return [this.dates[0],this.inls[0],this.ivas[0],json[0],url];

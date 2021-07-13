@@ -46,13 +46,31 @@ class NorrbottenDaily extends Scraper{
         while(i = t.iterateNext()){
         	raw += i.innerText;
 
-
-        	m = [...i.innerText.matchAll(/vårdas\s(\d+)\spersoner med covid-19 på sjukhus i länet,\s(varav\s)?(\d+)/gi)];
+			m = [...i.innerText.matchAll(/vårdas\s(\d+)\spersoner med covid-19 på sjukhus i länet/gi)];
         	if(m.length){
         	    inl = m[0][1]*1;
-        	    iva = m[0][3]*1;
-        	    continue;
+
+				m = [...i.innerText.matchAll(/vårdas\s(\d+)\spersoner med covid-19 på sjukhus i länet,\s(varav\s)?(\d+)/gi)];
+				if(m.length){
+					iva = m[0][3]*1;
+					continue;
+				}
+
+				m = [...i.innerText.matchAll(/vårdas\s(\d+)\spersoner med covid-19 på sjukhus i länet,\spersonen vårdas på/gi)];
+				if(m.length){
+					iva = 1;
+					continue;
+				}
+
+				m = [...i.innerText.matchAll(/vårdas\s(\d+)\spersoner med covid-19 på sjukhus i länet,\singen/gi)];
+				if(m.length){
+					iva = 0;
+					continue;
+				}
+
+				continue;
         	}
+
         	
 
         	m = [...i.innerText.matchAll(/Uppdaterat\s(\d+ \w+)/g)];

@@ -30,7 +30,7 @@ class DalarnaSub extends Dalarna{
   parse(xmlDoc){
         var t = xmlDoc.evaluate('/html/body/main/div/div[2]/div[1]/div/h1', xmlDoc).iterateNext().innerText;
         var raw=t;
-        var date = t.match(/(?<=: )\d+ \w+/);
+        var date = t.match(/(?<=:\s?)\d+ \w+/);
         date = moment(date[0]);
         date.set('year',2020);
 

@@ -44,7 +44,7 @@ class Uppsala2 extends Scraper{
 //        if(!a)
   //          a=xmlDoc.evaluate('//*[@id="app"]//a[contains(@href,"covid-19-excel")]', xmlDoc).iterateNext();
 
-       var t = new Uppsala3Sub(a.href.replace("file:///C:/","https://regionuppsala.se/"));
+       var t = new Uppsala3Sub(a.href.replace(/file:\/\/\/[a-z]:\//i,"https://regionuppsala.se/"));
 
        return t.scrape().then(r=>{
        	   [this.dates,this.inls,this.ivas]=[t.dates,t.inls,t.ivas];

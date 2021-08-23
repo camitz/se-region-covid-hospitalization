@@ -10,7 +10,7 @@ class Gotland extends Scraper{
   }
 
   parse(xmlDoc){
-        var t=xmlDoc.evaluate('//*[@id="newsItems"]/ul/li/article/a', xmlDoc);
+        var t=xmlDoc.evaluate('//*[@id="newsItems"]/ul/li/article', xmlDoc);
         var i;
        
         do{
@@ -20,7 +20,7 @@ class Gotland extends Scraper{
 
         var date = moment(i.querySelector('.news-date').innerText);
         
-       var t = new GotlandSub(i.href);
+       var t = new GotlandSub("https://www.gotland.se/"+i.querySelector('a').href.match(/\d+/)[0]);
 
        return t.scrape();
 
@@ -30,7 +30,7 @@ class Gotland extends Scraper{
 
 class GotlandSub extends Gotland {
   parse(xmlDoc){
-        var t=xmlDoc.evaluate('//*[@id="content"]/div[2]', xmlDoc);
+        var t=xmlDoc.evaluate('//*[@id="content"]/div[contains(@class,"contentTexts")]',xmlDoc);
         var raw = t.iterateNext().innerText.substr(0,1000);
         var date = moment([...raw.matchAll(/Publicerad ([0-9-]+)/g)][0][1]);
 
@@ -40,6 +40,9 @@ class GotlandSub extends Gotland {
 				return [date,0,0,raw,this.url];
 				
 			if(raw.match(/Ingen patient med konstaterat covid-19 vårdas för närvarande på Visby lasarett/gi))
+				return [date,0,0,raw,this.url];
+
+			if(raw.match(/På Visby lasarett vårdas just nu ingen patient med anledning av covid-19/gi))
 				return [date,0,0,raw,this.url];
 
             t = [...raw.matchAll(/([a-zåäö]+) person vårdas på Visby lasaretts intensivvårdsavdelning/gi)];

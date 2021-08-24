@@ -11,7 +11,8 @@ class Stockholm extends Scraper{
 
   parse(xmlDoc){
         var a=xmlDoc.evaluate('//*[@id="main-content"]//div[@class="m-search-list"]//a[contains(@href,"lagesrapport-om")]', xmlDoc).iterateNext();
-        var a1=xmlDoc.evaluate('//*[@id="main-content"]//div[@class="m-search-list"]//a[contains(@href,"dagslage-covid")]', xmlDoc).iterateNext();
+
+		var a1 = xmlDoc.evaluate('//*[@id="main-content"]//div[@class="m-search-list"]//a[contains(@href,"dagslage-covid") or contains(@href,"rapporten-om-sommarens-vard")]', xmlDoc).iterateNext();
 
        var me = this;
   	   var lagesrapport = new StockholmLagesrapport(a.href);
@@ -68,7 +69,7 @@ class StockholmDagslage extends Stockholm{
         //var inl = t.match(/(\d+) patienter med covid-19 vårdas i intensivvård vid akutsjukhus. Förutom de som får intensivvård är det (\d+)/);
         var inl = t.match(/Totalt antal patienter med covid-19 i behov av sjukhusvård:\s([a-zåäö1-9]+)\spatienter/i); 
         inl = this.ordinalOrNumber(inl[1]);
-        var iva = t.match(/([a-zåäö1-9]+)\spatienter med covid-19 i intensiv/i); 
+        var iva = t.match(/([a-zåäö0-9]+)\spatienter med covid-19 i intensiv/i); 
         iva = this.ordinalOrNumber(iva[1]);
 
         var raw = (raw+t).substr(0,300);

@@ -64,7 +64,7 @@ class StockholmDagslage extends Stockholm{
         var raw=t;
         var date = moment(t.match(/\d+ \w+/)[0]);
         date.set("year",2021);
-        t = xmlDoc.evaluate('//*[@id="first-content-container"]/div[1]', xmlDoc).iterateNext().innerText;
+        t = xmlDoc.evaluate('//*[@id="first-content-container"]/div[contains(@class,"editorial-content")]', xmlDoc).iterateNext().innerText;
 
         //var inl = t.match(/(\d+) patienter med covid-19 vårdas i intensivvård vid akutsjukhus. Förutom de som får intensivvård är det (\d+)/);
         var inl = t.match(/Totalt antal patienter med covid-19 i behov av sjukhusvård:\s([a-zåäö1-9]+)\spatienter/i); 

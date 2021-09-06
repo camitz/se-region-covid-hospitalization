@@ -68,6 +68,12 @@ class NorrbottenDaily extends Scraper{
 					continue;
 				}
 
+				m = [...i.innerText.matchAll(/vårdas\s(\d+)\spersone?r? med covid-19 på sjukhus i länet\./gi)];
+				if(m.length){
+					iva = 0;
+					continue;
+				}
+
 				continue;
         	}
 

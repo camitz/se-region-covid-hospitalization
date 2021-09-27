@@ -89,7 +89,7 @@ class ScraperApp {
 		 ];
 
 		var uppsalaScraper = new scrapers.Uppsala2().do();
-		//var allScrapers = [new scrapers.Ostergotland()];
+		var allScrapers = [new scrapers.Gotland()];
 
 		//scrapers.forEach(x=>x.do())
 

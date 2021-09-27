@@ -1,26 +1,20 @@
 const Scraper = require('../scraper')
 const $ = require('jquery');
 const moment = require('../moment.js')
+const pdfjsLib = require('pdfjs-dist')
 
 class Gotland extends Scraper{
-    _baseUrl = 'https://www.gotland.se/nyhetsarkiv';
+    _baseUrl = 'https://www.gotland.se/statistikcovid19';
 
 	get name() {
     return 'Gotland';
   }
 
   parse(xmlDoc){
-        var t=xmlDoc.evaluate('//*[@id="newsItems"]/ul/li/article', xmlDoc);
-        var i;
-       
-        do{
-            i = t.iterateNext();
-        }while(!i.querySelector('.news-header').innerText.trim().startsWith("Lägesrapport om covid"));
-        var raw = i.innerText;
-
-        var date = moment(i.querySelector('.news-date').innerText);
-        
-       var t = new GotlandSub("https://www.gotland.se/"+i.querySelector('a').href.match(/\d+/)[0]);
+       var t=xmlDoc.evaluate("//*[@id='contentContainer']//a[contains(text(),'Veckorapport om covid')]", xmlDoc).iterateNext();
+       var h = t.href;
+               
+       var t = new GotlandSub(h);
 
        return t.scrape();
 
@@ -28,60 +22,176 @@ class Gotland extends Scraper{
 }
 
 
-class GotlandSub extends Gotland {
-  parse(xmlDoc){
-        var t=xmlDoc.evaluate('//*[@id="content"]/div[contains(@class,"contentTexts")]',xmlDoc);
-        var raw = t.iterateNext().innerText.substr(0,1000);
-        var date = moment([...raw.matchAll(/Publicerad ([0-9-]+)/g)][0][1]);
 
 
-        try{
-			if(raw.match(/För närvarande vårdas ingen person med sjukdomen covid-19 på Visby lasarett/gi))
-				return [date,0,0,raw,this.url];
-				
-			if(raw.match(/Ingen patient med konstaterat covid-19 vårdas för närvarande på Visby lasarett/gi))
-				return [date,0,0,raw,this.url];
+class GotlandSub extends Scraper{
+	_baseUrl = 'https://www.gotland.se/';
 
-			if(raw.match(/På Visby lasarett vårdas just nu ingen patient med anledning av covid-19/gi))
-				return [date,0,0,raw,this.url];
+	get name() {
+        return 'Uppsala';
+  }
 
-            t = [...raw.matchAll(/([a-zåäö]+) person vårdas på Visby lasaretts intensivvårdsavdelning/gi)];
-            if(t.length)
-			    return [date,this.ordinalOrNumber(t[0][1]),this.ordinalOrNumber(t[0][2]),raw,this.url];
-            
-            t = [...raw.matchAll(/([a-zåäö]+) person med sjukdomen covid-19 vårdas på Visby lasaretts intensivvårdsavdelning/gi)];
-            if(t.length)
-			    return [date,this.ordinalOrNumber(t[0][1]),this.ordinalOrNumber(t[0][2]),raw,this.url];
+  contenttype = "pdf";
 
-			t = [...raw.matchAll(/På Visby lasarett vårdas för närvarande ([a-zåäö]+|\d+) patienter.*, varav ([a-zåäö]+|\d+)/gi)];
-			if(t.length)
-			    return [date,this.ordinalOrNumber(t[0][1]),this.ordinalOrNumber(t[0][2]),raw,this.url];
+  getpdfelements(pdfUrl){
+  	 var pdf = pdfjsLib.getDocument(pdfUrl);
+  return pdf.promise.then(function(pdf) { // get all pages text
+      var page = pdf.getPage(1);
 
-			t = [...raw.matchAll(/På Visby lasarett vårdas ([a-zåäö0-9]+) patient.+samt ([a-zåäö0-9]+) patienter /gi)];
-			if(t.length){
-    			var t1 = [...raw.matchAll(/Ingen patient har i nuläget behov av intensivvård på grund av covid-19./gi)];
-    			    return [date,this.ordinalOrNumber(t[0][1])+this.ordinalOrNumber(t[0][2]),0,raw,this.url];				
-			}
+      var txt = "";var objs=[];
+      return page.then(function(page) { // add page promise
+        return page.getOperatorList().then(function (ops) {
+            for (var i=0; i < ops.fnArray.length; i++) {
+                if (ops.fnArray[i] == pdfjsLib.OPS.paintImageXObject) {
+                    objs.push(ops.argsArray[i][0])
+                }
+            }
+            return objs;
+        }).then(function (objs){
+        	return new Promise((resolve,reject)=>{
+        		page.objs.get(objs[3],img=>{
+        			var canvas = document.createElement('canvas');
+        			[canvas.width, canvas.height] = [img.width,img.height];
+        			if(img.data.length == img.width*img.height*3){
+        				var imageData = [];
+        				for (var i = 0; i< img.data.length; i+=3){
+        					Array.prototype.push.apply(imageData, [...img.data.slice(i,i+3), 255]);
+        				}
+        				canvas.getContext("2d").putImageData(new ImageData(new Uint8ClampedArray(imageData),img.width),0,0);
+        			}else
+    					canvas.getContext("2d").putImageData(new ImageData(img.data,img.width),0,0);
 
-            var inl = -1;
-			t = [...raw.matchAll(/\s([a-zåäö]+|\d+)\s(person|patient)(.*covid-19)?.*på (Visby lasarett|vårdavdelning)/gi)][0];
-			if(t.length)
-    			inl = this.ordinalOrNumber(t[1]);
+					// create a new img object
+					var image = new Image();
+					// set the img.src to the canvas data url
+					document.getElementById("uppsalaimg").src = canvas.toDataURL();
+					if(img.width<1000)
+					{
+							document.getElementById("uppsalaimg").width=img.width*2;
+        					document.getElementById("uppsalaimg").height=img.height*2;
 
-			var iva =0;
+					}
+        			resolve(img);
+        		});
+        	});
+        	
+        });
+      });
+    
+  });
+  }
+  
+  parse(img){
+  	var verticalScan = [], colors=[],colorHist=[];
+  	var bitdepth = img.data.length/img.width/img.height;
 
-			if(!raw.match(/men är inte i behov av i/gi) && !raw.match(/ingen (vårdas )?på i/gi)) {
-				var t = [...raw.matchAll(/varav\s([a-zåäö]+|\d+)\spå intensiv/gi)];
-				if (t.length)
-					iva = this.ordinalOrNumber(t[0][1]);
-				else if(inl<0)				    
-					return [date,"recode", "recode",raw,this.url];
-			}
+	var canvas = document.getElementById("uppsalacanvas");
+	this.ctx = canvas.getContext("2d");
+	this.zoom = img.width<1000 ? 2 : 1;
 
-			return [date,inl, iva,raw,this.url];
-        } catch(e){
-            return [date,"recode", "recode",raw,this.url];
-        }
+	canvas.width = img.width * this.zoom;
+	canvas.height = img.height * this.zoom;
+
+  	for(var x=0; x<img.width ;x++){
+  		verticalScan[x]=[];
+  	    for(var y=0; y <img.height;y++){
+  	    	var offset = y*img.width*bitdepth+x*bitdepth;
+  	    	
+  	    	var pixel = img.data[offset]*255*255+img.data[offset+1]*255+img.data[offset+2];
+  	    	if(bitdepth==5)
+  	    	    pixel = pixel*255 + img.data[offset+2];
+
+  	        verticalScan[x][y]=pixel;
+  	        if(colors.indexOf(verticalScan[x][y])===-1){
+  	            colors.push(verticalScan[x][y]);
+  	            colorHist.push(0);
+  	        }
+  	        colorHist[colors.indexOf(verticalScan[x][y])]++;
+  	    }
+  	}
+  	var colorTable = colors.map((x,i)=>[x.toString(16),colorHist[i]]).sort((a,b)=>b[1]-a[1]);
+  	colors = colorTable.map(x=>parseInt("0x"+x[0]));
+  	for(x=0; x<img.width; x++){
+  	    for(y=0; y <img.height; y++){
+  	    	verticalScan[x][y]=colors.indexOf(verticalScan[x][y]);
+  	    }
+  	}
+  	//verticalScan=verticalScan.splice(41);
+    
+    document.getElementById("verticalScan").innerText=verticalScan.map((x,i)=>""+i+": "+x.map(y=>y>=10?(y+""):("0"+y)).join(",")).join("\n");
+    const colorInl = 2,//bitdepth==4?2:1, //apricot,"fe01ff"1
+        colorIva = 8,//,//red, "f3a4eb"4/5
+        colorOther = 6;//3; //greyblue,"9189aa"2
+        
+    const firstBarStartsAt = verticalScan.findIndex(v=>v.some(x=>x==colorIva||x==colorOther||x==colorInl));
+    for (var v = firstBarStartsAt; v < firstBarStartsAt+20 && verticalScan[v+1].filter(x=>x==colorIva||x==colorOther||x==colorInl).length == verticalScan[v].filter(x=>x==colorIva||x==colorOther||x==colorInl).length; v++);
+    for (v = v+1; v < firstBarStartsAt+20 && verticalScan[v+1].filter(x=>x==colorIva||x==colorOther||x==colorInl).length == verticalScan[v].filter(x=>x==colorIva||x==colorOther||x==colorInl).length; v++);
+
+    const maxBarAndGapWidth=v+2-firstBarStartsAt;
+
+    var bars=[],d=0,vs=[];
+    for (v = firstBarStartsAt; v < img.width; v += maxBarAndGapWidth) {
+    	var v0=v;
+    	while(v>v0-3 && verticalScan[v-1].filter(x=>x==colorIva||x==colorOther||x==colorInl).length == verticalScan[v].filter(x=>x==colorIva||x==colorOther||x==colorInl).length)
+    	    v--;
+    	vs.push(v);
+    	var sample = verticalScan[v].slice(Math.floor(50/600*img.height));
+    	var bar = [sample.filter(x=>x==colorInl).length,
+    	        sample.filter(x=>x==colorIva).length,
+    	        sample.filter(x=>x==colorOther).length];
+    	bars.push(bar);
+        
+
+        var o = sample.reduceRight((a,x,i)=>(x==colorIva||x==colorOther||x==colorInl)&&a==-1?i:a, -1);
+        this.plot(v, o);
+        this.plot(v, o-=bar[0]);
+        this.plot(v, o-=bar[1]);
+        this.plot(v, o-=bar[2]);
+    }
+
+    bars = bars.map(b=>
+    	    [...b,
+    	    b.reduce((a,x)=>a+x),
+    	    0//b.reduce((a,x)=>a+(x>0?1:0),0)-1 //space in between bars
+    	    ]);
+    bars = bars.map(b=>
+    	    [...b,
+    	    b[3]+b[4]
+    	    ]);
+    	    
+    const maxBar = bars.map(b=>b[5]).reduce((a,b)=>Math.max(a,b));
+    bars = bars.map(b=>
+    	    [...b,
+    	    b[5]/maxBar*127.0+1,
+    	    b[1]/maxBar*127.0,
+    	    ]);
+
+        var date = this.url.match(/\d{6}/);
+        date = moment(date,"YYMMDD");
+        var dates = [...Array(bars.length).keys()].map(x=>moment(date).add(-bars.length+1+x,'days'));
+        var inls = bars.map(x=>Math.round(x[6])), ivas =bars.map(x=>Math.round(x[7]));
+        
+    bars = bars.map((b,i) => [vs[i],...b]);
+
+        [this.dates,this.inls,this.ivas]=[dates,inls,ivas];
+
+        return [date,this.inls[this.inls.length-1],this.ivas[this.inls.length-1],null,this.url,null,
+        this.dates,
+        this.inls,
+        this.ivas
+        ];
+  }
+
+    plot(x,y){
+  	if(!x && !Y)
+  	return;
+  	  this.ctx.beginPath();
+      this.ctx.arc(x*this.zoom,y*this.zoom, 2, 0, 2 * Math.PI, false);
+      this.ctx.fillStyle = 'pink';
+      this.ctx.fill();
+//      context.lineWidth = 5;
+  //    context.strokeStyle = '#003300';
+    //  context.stroke();
   }
 }
 

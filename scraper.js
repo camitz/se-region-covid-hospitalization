@@ -77,7 +77,7 @@ class Scraper{
 		if(corsproxy)
 			url = http + corsproxy + this.url;
 
-		if(this.url.endsWith(".pdf")){			
+		if(this.url.endsWith(".pdf") ||this.contenttype=="pdf"){			
 			if(me.getpdfelements)
 		        return me.getpdfelements(url).then(items=>me.parse(items));
 

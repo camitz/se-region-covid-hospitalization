@@ -36,7 +36,7 @@ class Uppsala2 extends Scraper{
 	_baseUrl = 'https://regionuppsala.se/det-har-gor-vi/vara-verksamheter/halso-och-sjukvard/information-om-coronaviruset/';
 
 	get name() {
-    return 'Uppsala2';
+    return 'Uppsala';
   }
 
   parse(xmlDoc){
@@ -99,7 +99,7 @@ class Uppsala2Sub extends Scraper{
 	_baseUrl = 'https://www.regionuppsala.se/Global/Corona/200605-Nul%c3%a4gesbild%20Region%20Uppsala.pdf';
 
 	get name() {
-        return 'Uppsala2';
+        return 'Uppsala';
   }
 
   getpdfelements(pdfUrl){

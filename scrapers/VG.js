@@ -29,8 +29,8 @@ class VG2 extends Scraper{
             var l = dataObject.length;
             
             this.dates = dataObject.map(x=>moment(x[0].replace("-"," ")).set("year",2020));
-            this.inls = dataObject.map(x=>x[1]*1);
-            this.ivas = dataObject.map(x=>x[2]*1);
+            this.inls = dataObject.map(x=>x[2]*1);
+            this.ivas = dataObject.map(x=>x[1]*1);
 
 			var raw = JSON.stringify(dataObject).replaceAll("SAKNAS","na").replaceAll("#na!","na");
 

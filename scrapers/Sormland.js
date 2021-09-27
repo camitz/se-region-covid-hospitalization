@@ -23,7 +23,7 @@ class Sormland extends Scraper{
         var inl = t1[2]*1;
         var iva = this.ordinalOrNumber(t1[3]);
 
-        var t2 = [...raw.matchAll(/Ingen av dessa patienter får intensivvård/gi)];
+        var t2 = [...raw.matchAll(/Ingen av dessa patienter får intensivvård|Av\sdessa\sfår\singen\spatient\sintensivvård/gi)];
         if(t2.length)
             iva=0;
 

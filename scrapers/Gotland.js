@@ -2,6 +2,7 @@ const Scraper = require('../scraper')
 const $ = require('jquery');
 const moment = require('../moment.js')
 const pdfjsLib = require('pdfjs-dist')
+const tesseract = require('tesseract.js')
 
 class Gotland extends Scraper{
     _baseUrl = 'https://www.gotland.se/statistikcovid19';
@@ -61,16 +62,8 @@ class GotlandSub extends Scraper{
         			}else
     					canvas.getContext("2d").putImageData(new ImageData(img.data,img.width),0,0);
 
-					// create a new img object
-					var image = new Image();
 					// set the img.src to the canvas data url
-					document.getElementById("uppsalaimg").src = canvas.toDataURL();
-					if(img.width<1000)
-					{
-							document.getElementById("uppsalaimg").width=img.width*2;
-        					document.getElementById("uppsalaimg").height=img.height*2;
-
-					}
+					document.getElementById("gotlandimg").src = canvas.toDataURL();
         			resolve(img);
         		});
         	});
@@ -82,7 +75,16 @@ class GotlandSub extends Scraper{
   }
   
   parse(img){
-  	var verticalScan = [], colors=[],colorHist=[];
+	var x_axis_img = getImagePortion(img,0,0,100,100);
+
+	var canvas = document.createElement('canvas');
+	[canvas.width, canvas.height] = [100,100];
+
+	canvas.getContext("2d").putImageData(new ImageData(img.data,img.width),0,0);
+
+	document.getElementById("gotlandyaxis").src = canvas.toDataURL();
+
+	var verticalScan = [], colors=[],colorHist=[];
   	var bitdepth = img.data.length/img.width/img.height;
 
 	var canvas = document.getElementById("uppsalacanvas");
@@ -193,6 +195,29 @@ class GotlandSub extends Scraper{
   //    context.strokeStyle = '#003300';
     //  context.stroke();
   }
+
+  getImagePortion(imgObj, startX, startY, newWidth, newHeight) {
+	/* the parameters: - the image element - the new width - the new height - the x point we start taking pixels - the y point we start taking pixels - the ratio */
+	//set up canvas for thumbnail
+	var tnCanvas = document.createElement('canvas');
+	var tnCanvasContext = tnCanvas.getContext('2d');
+	tnCanvas.width = newWidth; tnCanvas.height = newHeight;
+
+	/* use the sourceCanvas to duplicate the entire image. This step was crucial for iOS4 and under devices. Follow the link at the end of this post to see what happens when you don�t do this */
+	var bufferCanvas = document.createElement('canvas');
+	var bufferContext = bufferCanvas.getContext('2d');
+	bufferCanvas.width = imgObj.naturalWidth;
+	bufferCanvas.height = imgObj.naturalHeight;
+	bufferContext.drawImage(imgObj, 0, 0);
+
+	/* now we use the drawImage method to take the pixels from our bufferCanvas and draw them into our thumbnail canvas */
+	try {
+		tnCanvasContext.drawImage(bufferCanvas, startX, startY, newWidth, newHeight, 0, 0, newWidth, newHeight);
+	} catch (e) { 
+		console.log(e);
+	}
+	return tnCanvas;
+}
 }
 
 

@@ -66,9 +66,11 @@ class GotlandSub extends Scraper{
   
   parse(img){
 
-	img.portion(0, 200, 200,400).putToDom(document.getElementById("gotlandxaxis"));
-	img.portion(0,400,200,400).putToDom(document.getElementById("gotlandyaxis"));
-//	img.portion(0,400,200,400).putToDom(document.getElementById("gotlandgraph"));
+	var graphDim = [177, 480, 700, 350]; //originX, originY, graphWidth, graphHeight
+
+	img.portion(graphDim[0], graphDim[1] - 181, graphDim[2], 180).putToDom(document.getElementById("gotlandxaxis"));
+	img.portion(graphDim[0] - 57, graphDim[1]-15, 57, graphDim[3]).putToDom(document.getElementById("gotlandyaxis"));
+	img.portion(...graphDim).putToDom(document.getElementById("gotlandgraph"));
 
 	var verticalScan = [], colors=[],colorHist=[];
   	var bitdepth = img.data.length/img.width/img.height;

@@ -47,6 +47,7 @@ class ImageWrapper{
 		
 		var startX, startY, newWidth, newHeight;
 		[startX, startY, newWidth, newHeight] = dim;
+		startY = this.height - startY - newHeight;
 
 		/* the parameters: - the image element - the new width - the new height - the x point we start taking pixels - the y point we start taking pixels - the ratio */
 		//set up canvas for thumbnail

@@ -2,6 +2,7 @@ const Scraper = require('../scraper')
 const $ = require('jquery');
 const moment = require('../moment.js')
 const ImageWrapper = require('../imageWrapper.js')
+const ImageScan = require('../imageScan.js')
 const pdfjsLib = require('pdfjs-dist')
 const tesseract = require('tesseract.js')
 
@@ -66,11 +67,18 @@ class GotlandSub extends Scraper{
   
   parse(img){
 
-	var graphDim = [177, 480, 700, 350]; //originX, originY, graphWidth, graphHeight
+	var graphDim = [177, 480, 700, 300]; //originX, originY, graphWidth, graphHeight
 
-	img.portion(graphDim[0], graphDim[1] - 181, graphDim[2], 180).putToDom(document.getElementById("gotlandxaxis"));
-	img.portion(graphDim[0] - 57, graphDim[1]-15, 57, graphDim[3]).putToDom(document.getElementById("gotlandyaxis"));
-	img.portion(...graphDim).putToDom(document.getElementById("gotlandgraph"));
+	var xaxisImg = img.portion(graphDim[0], graphDim[1] - 181, graphDim[2], 180);
+	xaxisImg.putToDom(document.getElementById("gotlandxaxis"));
+
+	var yaxisImg = img.portion(graphDim[0] - 57, graphDim[1]-15, 57, graphDim[3]);
+	yaxisImg.putToDom(document.getElementById("gotlandyaxis"));
+
+	var graphImg = img.portion(...graphDim);
+	graphImg.putToDom(document.getElementById("gotlandgraph"));
+
+	var scan = new ImageScan(graphImg);
 
 	var verticalScan = [], colors=[],colorHist=[];
   	var bitdepth = img.data.length/img.width/img.height;
@@ -82,30 +90,6 @@ class GotlandSub extends Scraper{
 	canvas.width = img.width * this.zoom;
 	canvas.height = img.height * this.zoom;
 
-  	for(var x=0; x<img.width ;x++){
-  		verticalScan[x]=[];
-  	    for(var y=0; y <img.height;y++){
-  	    	var offset = y*img.width*bitdepth+x*bitdepth;
-  	    	
-  	    	var pixel = img.data[offset]*255*255+img.data[offset+1]*255+img.data[offset+2];
-  	    	if(bitdepth==5)
-  	    	    pixel = pixel*255 + img.data[offset+2];
-
-  	        verticalScan[x][y]=pixel;
-  	        if(colors.indexOf(verticalScan[x][y])===-1){
-  	            colors.push(verticalScan[x][y]);
-  	            colorHist.push(0);
-  	        }
-  	        colorHist[colors.indexOf(verticalScan[x][y])]++;
-  	    }
-  	}
-  	var colorTable = colors.map((x,i)=>[x.toString(16),colorHist[i]]).sort((a,b)=>b[1]-a[1]);
-  	colors = colorTable.map(x=>parseInt("0x"+x[0]));
-  	for(x=0; x<img.width; x++){
-  	    for(y=0; y <img.height; y++){
-  	    	verticalScan[x][y]=colors.indexOf(verticalScan[x][y]);
-  	    }
-  	}
   	//verticalScan=verticalScan.splice(41);
     
     document.getElementById("verticalScan").innerText=verticalScan.map((x,i)=>""+i+": "+x.map(y=>y>=10?(y+""):("0"+y)).join(",")).join("\n");

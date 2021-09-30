@@ -53,8 +53,7 @@ class GotlandSub extends Scraper{
         	return new Promise((resolve,reject)=>{
         		page.objs.get(objs[3],img=>{
 					var graphImage = new ImageWrapper(img);
-
-					document.getElementById("gotlandimg").src = graphImage.canvas.toDataURL();
+					graphImage.putToDom(document.getElementById("gotlandimg"));
         			resolve(graphImage);
         		});
         	});
@@ -66,9 +65,10 @@ class GotlandSub extends Scraper{
   }
   
   parse(img){
-	var y_axis_img = img.portion(100,100);
 
-	document.getElementById("gotlandyaxis").src = y_axis_img.canvas.toDataURL();
+	img.portion(0, 200, 200,400).putToDom(document.getElementById("gotlandxaxis"));
+	img.portion(0,400,200,400).putToDom(document.getElementById("gotlandyaxis"));
+//	img.portion(0,400,200,400).putToDom(document.getElementById("gotlandgraph"));
 
 	var verticalScan = [], colors=[],colorHist=[];
   	var bitdepth = img.data.length/img.width/img.height;

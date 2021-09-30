@@ -67,6 +67,10 @@ class ImageWrapper{
 		}
 		return new ImageWrapper(tnCanvas);
 	}
+
+	putToDom(el) {
+		el.src = this.canvas.toDataURL();	
+	}
 }
 
 module.exports = ImageWrapper

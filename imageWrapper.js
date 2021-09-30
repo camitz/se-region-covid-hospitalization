@@ -24,7 +24,7 @@ class ImageWrapper{
 	}
 
 	get imageData(){
-		return this._imageData ?? this._canvas.getContext("2d").getImageData(0,0,this.width,this.height);
+		return this._imageData ?? (this._imageData = this._canvas.getContext("2d").getImageData(0,0,this.width,this.height));
 	}
 
 	toBitDepth4(img) {

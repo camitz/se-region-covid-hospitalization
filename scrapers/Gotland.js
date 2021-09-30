@@ -75,14 +75,12 @@ class GotlandSub extends Scraper{
   }
   
   parse(img){
-	var x_axis_img = getImagePortion(img,0,0,100,100);
+	var x_axis_img = this.getImagePortion(document.getElementById("gotlandimg"),0,0,100,100);
 
 	var canvas = document.createElement('canvas');
 	[canvas.width, canvas.height] = [100,100];
 
-	canvas.getContext("2d").putImageData(new ImageData(img.data,img.width),0,0);
-
-	document.getElementById("gotlandyaxis").src = canvas.toDataURL();
+	document.getElementById("gotlandyaxis").src = x_axis_img.toDataURL();
 
 	var verticalScan = [], colors=[],colorHist=[];
   	var bitdepth = img.data.length/img.width/img.height;

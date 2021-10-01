@@ -4,7 +4,7 @@ const moment = require('../moment.js')
 const ImageWrapper = require('../imageWrapper.js')
 const ImageScan = require('../imageScan.js')
 const pdfjsLib = require('pdfjs-dist')
-const tesseract = require('tesseract.js')
+const Tesseract = require('tesseract.js')
 
 class Gotland extends Scraper{
     _baseUrl = 'https://www.gotland.se/statistikcovid19';
@@ -78,7 +78,17 @@ class GotlandSub extends Scraper{
 	var graphImg = img.portion(...graphDim);
 	graphImg.putToDom(document.getElementById("gotlandgraph"));
 
+	xaxisImg.rotate(-Math.PI/4).putToDom(document.getElementById("gotlandgraph"));
+
 	var scan = new ImageScan(graphImg);
+
+	return Tesseract.recognize(
+	  xaxisImg.rotate(-Math.PI/4).canvas,
+	  'eng',
+	  { logger: m => console.log(m) }
+	).then(result => {
+	  console.log(result);
+	});
 
 	var verticalScan = [], colors=[],colorHist=[];
   	var bitdepth = img.data.length/img.width/img.height;

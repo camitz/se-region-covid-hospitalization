@@ -107,7 +107,7 @@ class Scraper{
 						if(me.parse){
 							var parser = new DOMParser();   
 							var xmlDoc = parser.parseFromString(result,"text/html");
-							parsed=me.parse(xmlDoc);
+							parsed = Promise.resolve(me.parse(xmlDoc));
 						}        
 						else if(me.parseCsv)
 							parsed = me.parseCsv(result);

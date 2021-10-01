@@ -69,6 +69,34 @@ class ImageWrapper{
 		return new ImageWrapper(tnCanvas);
 	}
 
+	rotate(degree) { 
+		var tnCanvas = document.createElement('canvas');
+		var r = Math.sqrt(this.width*this.width+this.height*this.height);
+		tnCanvas.width = r;
+		tnCanvas.height = r;
+
+		var context = tnCanvas.getContext('2d');
+
+		// save the current co-ordinate system 
+		// before we screw with it
+		context.save(); 
+
+		// move to the middle of where we want to draw our image
+		context.translate(r/2, r/2);
+
+		// rotate around that point, converting our 
+		// angle from degrees to radians 
+		context.rotate(degree);
+
+		// draw it up and to the left by half the width
+		// and height of the image 
+		context.drawImage(this.canvas, -r/2, -r/8);
+
+		// and restore the co-ords to how they were when we began
+		context.restore(); 
+		return new ImageWrapper(tnCanvas);
+	}
+
 	putToDom(el) {
 		el.src = this.canvas.toDataURL();	
 	}

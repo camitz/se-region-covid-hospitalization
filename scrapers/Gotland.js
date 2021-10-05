@@ -18,8 +18,9 @@ class Gotland extends Scraper{
        var h = t.href;
 
        var t = new GotlandSub(h);
+	   var p = t.scrape();
 
-       return t.scrape();//.then(r=>{r[4] = h; return r;});
+       return p;//.then(r=>{r[4] = h; return r;});
   }
 }
 
@@ -141,7 +142,7 @@ class GotlandSub extends Scraper{
 			  return result.data.lines.map(x=>{return {text:x.text.replace("\n",""),ypos:(x.bbox.y0+x.bbox.y1)/2};});
 			})]).then(((extractData, parser, results)=>{
 				console.log(results.length);
-				extractData.bind(parser)(results);
+				return extractData.bind(parser)(results);
 			}).bind(undefined, extractData, this));
   }
 

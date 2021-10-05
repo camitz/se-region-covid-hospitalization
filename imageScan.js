@@ -59,7 +59,7 @@ class ImageScan{
 		}
 
 		var colorTable = colors.map((x,i)=>[x.toString(16).padStart(6,"0"), colorHist[i]]);//Build ordered mapping into histogram of hex-strings.
-		if (!this._settings?.colorTable) { //Sort by frequency, only if colortable not provided.
+		if (!this._settings?.colorTable && (this._settings?.sortColortable ?? true)) { //Sort by frequency, only if colortable not provided.
 			colorTable = colorTable.sort((a,b)=>b[1]-a[1]);
 			colors = colorTable.map(x => parseInt("0x"+x[0]));  //Order colors accordingly.
 		}

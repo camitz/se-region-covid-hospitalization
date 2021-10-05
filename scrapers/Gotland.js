@@ -19,7 +19,7 @@ class Gotland extends Scraper{
 
        var t = new GotlandSub(h);
 
-       return t.scrape().then(r=>{r[4] = h; return r;});
+       return t.scrape();//.then(r=>{r[4] = h; return r;});
   }
 }
 
@@ -67,7 +67,7 @@ class GotlandSub extends Scraper{
   parse(img){
 	var legendImg = img.portion(220,49,50,200);
 	legendImg.putToDom(document.getElementById("gotlandgraph"));
-	var legendScan = new ImageScan(legendImg);
+	var legendScan = new ImageScan(legendImg, {sortColortable: false});
 
 	var graphDim = [177, 480, 700, 300]; //originX, originY, graphWidth, graphHeight
 
@@ -84,7 +84,7 @@ class GotlandSub extends Scraper{
 	var graphScan = new ImageScan(graphImg, {colorTable: legendScan.colorTable});
 
 	var yaxisScan = new ImageScan(yaxisImg);
-	var yTickPos = yaxisScan.verticalScan[47].reduce((a,e,i)=>{if(e>0)a.push(i);return a;},[]);
+	var yTickPos = yaxisScan.verticalScan[47].reduce((a,e,i)=>{if(e>0)a.push(i-15);return a;},[]);
 	
 	var xaxisScan = new ImageScan(xaxisImg);
 	var xTickPos = xaxisScan.horizontalScan[xaxisImg.height-6].reduce((a,e,i)=>{if(e>0 && (a.length==0 || a[a.length-1]<i-5))a.push(i);return a;},[]);
@@ -101,14 +101,26 @@ class GotlandSub extends Scraper{
 		maxLabeledTickYPos  = maxLabeledTickYPos.lastIndexOf(Math.min(...maxLabeledTickYPos));
 		maxLabeledTickYPos = yTickPos[maxLabeledTickYPos];
 		
-		var barScans = xTickPos.map(x=>graphScan.verticalScan[x].reduce((a,e,i) => {
+		var barScans = xTickPos.splice(0,this.dates.length)
+				.map(x=>graphScan.verticalScan[x].reduce((a,e,i) => {
 			switch(e){
-				case 0: a[0] += 1.0/maxLabeledTickYPos*maxYLabel; break;
+				case 1: 
+					a[0] += 1.0/maxLabeledTickYPos*maxYLabel; break;
+				case 2: 
+					a[1] += 1.0/maxLabeledTickYPos*maxYLabel; break;
+				case 3: 
+					a[2] += 1.0/maxLabeledTickYPos*maxYLabel; break;
+				case 4: 
+					a[3] += 1.0/maxLabeledTickYPos*maxYLabel; break;
 			}
 			return a;
 		},[0,0,0,0]));
 		
-        return [this.dates[0],0,0,null,this.url];
+		this.ivas = barScans.map(x=>Math.round(x[0]+x[2],0));
+		this.ivas.reverse();
+		this.inls = barScans.map((x,i)=>Math.round(x[1]+x[3],0) + this.ivas[i]);
+		this.inls.reverse();
+        return [this.dates[0],this.inls[0],this.ivas[0],null,this.url];
 	}
 
 	return Promise.all([

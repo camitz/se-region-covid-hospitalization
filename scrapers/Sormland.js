@@ -15,12 +15,17 @@ class Sormland extends Scraper{
         var raw,t1,i;
         while(i=t.iterateNext()) {
         	raw = i.innerText;
-            t1 = [...raw.matchAll(/(\d\d?\s+\w+):\s(\d+).+?\.\s\s?Av dessa får\s+([a-zåäö]+|\d+)/gi)];
+            
+			t1 = [...raw.matchAll(/(\d\d?\s+\w+):\s(\d+).+?\.\s\s?Av dessa får\s+([a-zåäö]+|\d+)/gi)];
+            if(t1.length)
+                break;
+            
+			t1 = [...raw.matchAll(/(\d\d?\s+\w+):\s([a-zåäö]+|\d+).+?\.\s([a-zåäö]+|\d+)\spatienter intensivvårdas/gi)];
             if(t1.length)
                 break;
         }
         t1=t1[0];
-        var inl = t1[2]*1;
+        var inl = this.ordinalOrNumber(t1[2]);
         var iva = this.ordinalOrNumber(t1[3]);
 
         var t2 = [...raw.matchAll(/Ingen av dessa patienter får intensivvård|Av\sdessa\sfår\singen\spatient\sintensivvård/gi)];

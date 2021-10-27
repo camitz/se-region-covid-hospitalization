@@ -10,9 +10,9 @@ class Varmland extends Scraper{
 	}
 	
   parse(xmlDoc) {
-        var node = xmlDoc.evaluate('//article[@id="content"]//div[@class="EditorContent"]//h2', xmlDoc);
+        var node = xmlDoc.evaluate('//main//h2', xmlDoc);
 
-       var raw = null,t, inl=null, iva=null,date;
+       var raw = "",t, inl=null, iva=null,date;
 
        while(t = node.iterateNext()){
 			var m = [...t.innerText.matchAll(/Lägesbild\s(den)?\s(\d+\s[a-z]+)/gi)];
@@ -23,7 +23,7 @@ class Varmland extends Scraper{
             }
        }
 
-        node = xmlDoc.evaluate('//article[@id="content"]//div[@class="EditorContent"]//li', xmlDoc);
+        node = xmlDoc.evaluate('//main//li', xmlDoc);
        while(t = node.iterateNext()){
 			var m = [...t.innerText.matchAll(/(\d+)\spatienter\svarav\s(\d+)\spå intensiv/gi)];
 			if(m.length){

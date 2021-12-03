@@ -10,6 +10,7 @@ if (typeof $.ajaxPrefilter !== 'undefined')
 		//var providers = ['//cors-anywhere.herokuapp.com/',"//cors-proxy.htmldriven.com/?url=","//cors.corsproxy.io/url=","//thingproxy.freeboard.io/fetch/"];
 		//options.url = http + providers[3] + options.url;
 		options.url = http + '//cors-anywhere.herokuapp.com/' + options.url;
+		options.headers = {'x-requested-with': 'XMLHttpRequest'};
 	  }
 	});
 

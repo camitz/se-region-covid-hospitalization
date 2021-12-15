@@ -14,6 +14,8 @@ class JH extends Scraper{
         var i;
         do{
             i = t.iterateNext();
+			if(i === null)
+				return [moment(),"-","-","",""];
         }while(!i.innerText.trim().startsWith("Lägesrapport"));
        var t = new JHSub(i.href);
 

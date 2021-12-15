@@ -33,14 +33,14 @@ class Uppsala extends Scraper{
 
 
 class Uppsala2 extends Scraper{
-	_baseUrl = 'https://regionuppsala.se/det-har-gor-vi/vara-verksamheter/halso-och-sjukvard/information-om-coronaviruset/';
+	_baseUrl = 'https://regionuppsala.se/det-har-gor-vi/vara-verksamheter/halso-och-sjukvard/information-om-covid-19-coronaviruset/';
 
 	get name() {
     return 'Uppsala';
   }
 
   parse(xmlDoc){
-       var a=xmlDoc.evaluate('//*[@id="app"]//a[contains(@href,"nulagesbild-covid-19-region-uppsala.xlsx")]', xmlDoc).iterateNext();
+       var a=xmlDoc.evaluate('//*[@id="app"]//a[contains(@href,"nulagesbild-covid-19-region-uppsala") and contains(@href,"xlsx")]', xmlDoc).iterateNext()
 //        if(!a)
   //          a=xmlDoc.evaluate('//*[@id="app"]//a[contains(@href,"covid-19-excel")]', xmlDoc).iterateNext();
 

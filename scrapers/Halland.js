@@ -15,22 +15,22 @@ class Halland extends Scraper{
 
         var date = moment(raw);
 
-        var check = xmlDoc.evaluate('//*[@id="antal-inlagda-patienter-pa-hallands-sjukhus-2"]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
+        var check = xmlDoc.evaluate('(//*[@id="main"]//h2)[1]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
         if(!check.startsWith("Antal inlagda patienter på Hallands sjukhus"))
             throw "Halland failed check."
 
-        check = xmlDoc.evaluate('//*[@id="main"]/article/table[2]/tbody/tr[2]/td[1]/ul/li',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
+        check = xmlDoc.evaluate('//*[@id="main"]/article/table[1]/tbody/tr[2]/td[1]/ul/li',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
         if(!check.trim().startsWith("Totalt antal inlagda patienter som"))
             throw "Halland failed check."
 
-        check = xmlDoc.evaluate('//*[@id="main"]/article/table[2]/tbody/tr[3]/td[1]/ul/li',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
-        if(!check.trim().startsWith("Varav totalt inlagda på IVA"))
+        check = xmlDoc.evaluate('//*[@id="main"]/article/table[1]/tbody/tr[3]/td[1]/ul/li',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue
+        if(!check.trim().startsWith("Varav totalt inlagda patienter på IVA"))
             throw "Halland failed check."
 
-		var inl = xmlDoc.evaluate('//*[@id="main"]/article/table[2]/tbody/tr[2]/td[2]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
+		var inl = xmlDoc.evaluate('//*[@id="main"]/article/table[1]/tbody/tr[2]/td[2]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;
         inl=inl.match(/\d+/)[0]*1;
 
-        var iva = xmlDoc.evaluate('//*[@id="main"]/article/table[2]/tbody/tr[3]/td[2]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;        
+        var iva = xmlDoc.evaluate('//*[@id="main"]/article/table[1]/tbody/tr[3]/td[2]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;        
         iva=iva.match(/\d+/)[0]*1;
         
         var raw = xmlDoc.evaluate('//*[@id="main"]/article/table[1]',xmlDoc,null,XPathResult.STRING_TYPE ).stringValue;

@@ -3,29 +3,39 @@ const $ = require('jquery');
 const moment = require('../moment.js')
 
 class Kronoberg extends Scraper{
-    _baseUrl = 'https://regionkronoberg.se/corona';
+    _baseUrl = 'https://www.regionkronoberg.se/halsa-vard-tandvard/coronavirus/smittskyddslakarens-rapporter/';
 
 	get name() {
     return 'Kronoberg';
   }
 
-  parse(xmlDoc){
-        var table = xmlDoc.evaluate('//*[@id="content"]/div[2]/div', xmlDoc).iterateNext();
-        var t = table.querySelectorAll('table td')[4].innerText;
-        var raw = table.innerText.substr(0,300);
+	parse(xmlDoc){
+       var a = xmlDoc.evaluate('//*[@id="content"]//a[@class="arrow"]', xmlDoc).iterateNext();
+       var t = new KronobergSub(a.href);
 
-        var p = table.querySelector('p');
+       return t.scrape();
+  }
+}
 
-        var sel = "p~*", date = "";
-        while(!date)
-             date = table.querySelector(sel).innerText.match(/\d\d\d\d-\d\d-\d\d/), sel+="~*";
-        
-        date= moment(date[0]);
 
-        var inl = t.match(/\d+/)[0]*1;
-        var iva = t.match(/(?<=\()\d+/)[0]*1;
+class KronobergSub extends Scraper{
+    _baseUrl = 'https://www.regionkronoberg.se/halsa-vard-tandvard/coronavirus/smittskyddslakarens-rapporter/';
 
-        return [date,inl,iva,raw];
+	get name() {
+    return 'Kronoberg';
+  }
+	
+  parse(items) {
+	var date = (items[1][0].str + items[1][1].str).match(/[\d-]+/);
+	date = moment(date);
+	
+	var inl = items[1][4].str.match(/Inneliggande patienter: (\d+), varav (\d+)/);
+	var iva = inl[2]*1;
+	inl = inl[1]*1;
+
+	var raw = items[1].map(x=>x.str).join("\n");
+
+	return [date,inl,iva,raw,this.url];        	
   }
 }
 

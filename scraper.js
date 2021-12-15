@@ -171,7 +171,11 @@ class Scraper{
 	get ordinals(){
 		return ['noll','ett','två','tre','fyra','fem','sex','sju','åtta','nio','tio','elva','tolv','tretton','fjorton','femton','sexton','sjutton','arton','nitton'];
 	  }
+
 	ordinalOrNumber(s){
+		if (/ing(en|a)/i.test(s))
+			return 0;
+
         var r = this.ordinals.indexOf(s.toLowerCase().replace("en","ett"));
 		return r == -1 ? s*1 : r;
 	}

@@ -27,7 +27,7 @@ class KronobergSub extends Scraper{
 	
   parse(items) {
 	var date = (items[1][0].str + items[1][1].str).match(/[\d-]+/);
-	date = moment(date);
+	date = moment(date[0]);
 	
 	var inl = items[1][4].str.match(/Inneliggande patienter: (\d+), varav (\d+)/);
 	var iva = inl[2]*1;

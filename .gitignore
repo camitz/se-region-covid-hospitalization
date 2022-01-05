@@ -3,3 +3,4 @@ node_modules
 awsCreds.js
 bundle.js
 package-lock.json
+bundle.js.tmp-browserify-96005639045383839303

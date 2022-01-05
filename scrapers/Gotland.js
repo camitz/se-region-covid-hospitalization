@@ -38,39 +38,42 @@ class GotlandSub extends Scraper{
 
   getpdfelements(pdfUrl){
   	 var pdf = pdfjsLib.getDocument(pdfUrl);
-  return pdf.promise.then(function(pdf) { // get all pages text
-      var page = pdf.getPage(1);
+	  return pdf.promise.then(function(pdf) { // get all pages text
+		  var graphIndex = 2;
 
-      var txt = "";var objs=[];
-      return page.then(function(page) { // add page promise
-        return page.getOperatorList().then(function (ops) {
-            for (var i=0; i < ops.fnArray.length; i++) {
-                if (ops.fnArray[i] == pdfjsLib.OPS.paintImageXObject) {
-                    objs.push(ops.argsArray[i][0])
-                }
-            }
-            return objs;
-        }).then(function (objs){
-        	return new Promise((resolve,reject)=>{
-        		page.objs.get(objs[3],img=>{
-					var graphImage = new ImageWrapper(img);
-					graphImage.putToDom(document.getElementById("gotlandimg"));
-        			resolve(graphImage);
-        		});
-        	});
-        	
-        });
-      });
-    
-  });
+		  var page = pdf.getPage(1);
+		  var txt = "";var objs=[];
+
+		  return page.then(function(page) { // add page promise
+			return page.getOperatorList().then(function (ops) {
+				for (var i=0; i < ops.fnArray.length; i++) {
+					if (ops.fnArray[i] == pdfjsLib.OPS.paintImageXObject) {
+						objs.push(ops.argsArray[i][0])
+					}
+				}
+				return objs;
+			}).then(function (objs){
+				return new Promise((resolve,reject)=>{
+					page.objs.get(objs[graphIndex],img=>{
+						var graphImage = new ImageWrapper(img);
+						graphImage.putToDom(document.getElementById("gotlandimg"));
+						resolve(graphImage);
+					});
+				});
+				
+			});
+		  });
+		
+	  });
   }
   
   parse(img){
-	var legendImg = img.portion(220,49,50,200);
-	legendImg.putToDom(document.getElementById("gotlandgraph"));
+	var legendImg = img.portion(260,629,50,200);
+	legendImg.putToDom(document.getElementById("gotlandlegend"));
+
 	var legendScan = new ImageScan(legendImg, {sortColortable: false});
 
-	var graphDim = [177, 480, 700, 300]; //originX, originY, graphWidth, graphHeight
+	var graphDim = [185, 258, 720, 350]; //originX, originY, graphWidth, graphHeight
 
 	var xaxisImg = img.portion(graphDim[0], graphDim[1] - 181, graphDim[2], 180);
 	xaxisImg.putToDom(document.getElementById("gotlandxaxis"));

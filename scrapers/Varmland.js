@@ -10,7 +10,7 @@ class Varmland extends Scraper{
 	}
 	
   parse(xmlDoc) {
-        var node = xmlDoc.evaluate('//main//h2', xmlDoc);
+        var node = xmlDoc.evaluate('//main//div[contains(@class,"sv-text-portlet")]//*', xmlDoc);
 
        var raw = "",t, inl=null, iva=null,date;
 
@@ -19,11 +19,11 @@ class Varmland extends Scraper{
 			if(m.length){
 				raw+=t.innerText;
 				date = moment(m[0][2]);
+				date.set("year",2022);
 				break;
             }
        }
 
-        node = xmlDoc.evaluate('//main//li', xmlDoc);
        while(t = node.iterateNext()){
 			var m = [...t.innerText.matchAll(/(\d+)\spatienter\svarav\s(\d+)\spå intensiv/gi)];
 			if(m.length){

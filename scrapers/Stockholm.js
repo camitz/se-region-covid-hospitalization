@@ -44,7 +44,7 @@ class StockholmLagesrapport extends Stockholm{
         t = xmlDoc.evaluate('//*[@id="first-content-container"]/div[1]', xmlDoc).iterateNext().innerText;
 
         //var inl = t.match(/(\d+) patienter med covid-19 vårdas i intensivvård vid akutsjukhus. Förutom de som får intensivvård är det (\d+)/);
-        var inl = t.match(/Totalt vårdas just nu\s([a-zåäö0-9]+)\spatienter med /i);
+        var inl = t.match(/Totalt vårdas\s(?:just nu\s)?([a-zåäö0-9]+)\spatienter med /i);
         inl = this.ordinalOrNumber(inl[1]);
         var iva = t.match(/(\d+)\si\sintensivvård/i); 
         iva = iva[1]*1;

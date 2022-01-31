@@ -89,11 +89,10 @@ class ScraperApp {
 		 ];
 
 		var uppsalaScraper = new scrapers.Uppsala2().do();
-		//var allScrapers = [new scrapers.Gotland()];
+		// var allScrapers = [new scrapers.Kronoberg()];
 
 		//scrapers.forEach(x=>x.do())
 
-		//new DNSkrapan().do();
 		//new Uppsala2().do();
 		//new Stockholm().do();
 		Promise.allSettled([...allScrapers.map(x=>x.do()), uppsalaScraper]);//.then(this.timelineParse);

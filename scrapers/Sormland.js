@@ -20,7 +20,7 @@ class Sormland extends Scraper{
             if(t1.length)
                 break;
             
-			t1 = [...raw.matchAll(/(\d\d?\s+\w+):\s([a-zåäö]+|\d+).+?\.\s([a-zåäö]+|\d+)\spatienter intensivvårdas/gi)];
+			t1 = [...raw.matchAll(/(\d\d?\s+\w+):\s([a-zåäö]+|\d+).+?\.\s([a-zåäö]+|\d+)\spatient(er)? intensivvårdas/gi)];
             if(t1.length)
                 break;
         }

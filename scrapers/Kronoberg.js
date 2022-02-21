@@ -28,7 +28,7 @@ class Kronoberg extends Scraper{
       i = i.nextSibling;
     }while (i.tagName!="TABLE") 
 
-    i = i.querySelector("tr:nth-child(2) td:nth-child(2)");
+    i = i.querySelector("tr:nth-child(2) td:nth-child(1)");
 
     var inl = [...i.innerText.matchAll(/(\d+)\s\((\d+)\)/g)];
     var iva = inl[0][2]*1;

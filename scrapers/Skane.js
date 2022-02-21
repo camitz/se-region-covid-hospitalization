@@ -76,9 +76,9 @@ class SkaneDaily extends Skane{
   parse(xmlDoc){
               var t = xmlDoc.evaluate('//script', xmlDoc);
 
-        var raw="",i,date,inl,iva,m;
+        var raw="",i,week,inl,iva,m;
         while(i = t.iterateNext()){
-        	if(i.innerText.indexOf('chart-block-seven-179283')===-1)
+        	if(i.innerText.indexOf('chart-block-seven-177937')===-1)
         	    continue;
 
             var excelData;
@@ -90,7 +90,7 @@ class SkaneDaily extends Skane{
             }
 
             var l = excelData.Categories.length;
-            date = excelData.Categories[l-1].name;
+            week = excelData.Categories[l-1].name;
             this.dates = excelData.Categories.map(x=>moment(x.name));
 
             var f= x=>isNaN(x)?0:(x*1);
@@ -104,7 +104,7 @@ class SkaneDaily extends Skane{
             break;
         };
 
-        date = moment(date);
+        var date = moment().day("Tuesday").isoWeek(week);
                 
         return [date,inl,iva,raw,this.url];
   }

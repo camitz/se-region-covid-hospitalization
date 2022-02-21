@@ -89,7 +89,7 @@ class ScraperApp {
 		 ];
 
 		var uppsalaScraper = new scrapers.Uppsala2().do();
-		// var allScrapers = [new scrapers.Kronoberg()];
+		 var allScrapers = [new scrapers.Kronoberg(),new scrapers.Skane()];
 
 		//scrapers.forEach(x=>x.do())
 
